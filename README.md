@@ -3,7 +3,7 @@
 **A pianist plays a concert grand standing in a shallow mountain lake at sunset: a 3:51 film rendered offline,
 frame by frame, with three.js, set to an original piano piece.**
 
-[![Afterglow: the pianist and the concert grand in the lake at sunset](docs/stills/hero.jpg)]({{VIDEO_URL}})
+[![Afterglow: the pianist and the concert grand in the lake at sunset](docs/stills/hero.jpg)](https://github.com/Leonxlnx/afterglow/releases/download/v1.0/afterglow_1080p60.mp4)
 
 1920 x 1080, 60 fps, 13,857 frames. Every frame is the average of 16 to 128 sub-frames (motion blur, depth of field,
 anti-aliasing) rendered on a laptop's integrated GPU. The music, the performance, the piano, the pianist, the sky,
@@ -11,17 +11,17 @@ the mountains and the water were all made for this film.
 
 ## Watch the film
 
-- **[Afterglow, 1080p60 MP4 (H.264, AAC 320k, {{MP4_SIZE}})]({{VIDEO_URL}})**
+- **[Afterglow, 1080p60 MP4 (H.264, AAC 320k, 668.3 MB)](https://github.com/Leonxlnx/afterglow/releases/download/v1.0/afterglow_1080p60.mp4)**
 - A 1080p30 version for social media (`afterglow_x_1080p30.mp4`, every second frame of the film) is in the release
-- All downloads, release notes and checksums: [release v1.0]({{RELEASE_URL}})
+- All downloads, release notes and checksums: [release v1.0](https://github.com/Leonxlnx/afterglow/releases/tag/v1.0)
 
 ## Listen
 
 The soundtrack on its own: "Afterglow", an original solo piano piece (E-flat major, a C-minor bridge, then up a whole
 step to F major for the climax and the ending; 67 bars, 1,131 notes, 3:47).
 
-- [WAV, 48 kHz / 24-bit ({{WAV_SIZE}})]({{WAV_URL}})
-- [MP3, 320 kb/s ({{MP3_SIZE}})]({{MP3_URL}})
+- [WAV, 48 kHz / 24-bit (65.5 MB)](https://github.com/Leonxlnx/afterglow/releases/download/v1.0/afterglow.wav)
+- [MP3, 320 kb/s (9.1 MB)](https://github.com/Leonxlnx/afterglow/releases/download/v1.0/afterglow.mp3)
 
 The emotional pull of a slow ballad with a pop hook and a light hip-hop pocket in the choruses: intro, two verses
 with pre-choruses and choruses, a contrasting bridge, a build into the climax, a tag, a two-bar memory of the verse
@@ -128,7 +128,7 @@ and its neighbours, compression PSNR, colour matrix and range, and the audio ons
 |---|---|
 | Film | 230.95 s (3:51), 13,857 frames at 60 fps, 1920 x 1080, 26 shots |
 | Sub-frames | 360,368 in the release render (26.0 per frame on average); 473,760 with full N throughout |
-| Render | {{RENDER_TIME}} |
+| Render | 21.8 h of wall-clock rendering for the 47 chunks on the shared laptop GPU, pauses for other GPU jobs included; about 9.7 h of it pure render time (median frame time per chunk); 23.7 GB of lossless FFV1 |
 | Hardware | one laptop: AMD Ryzen 7 260, Radeon 780M integrated GPU, Windows 11, Chrome 155 headless (ANGLE / D3D11) |
 | Lossless master | 47 FFV1 chunks |
 | Sync | every key reaches bottom within one film frame of its note-on, which the sampler aligns with the audible onset (1,131 / 1,131 notes, from the tracks); in the rendered scene, 30 probed notes: fingertip on its key 30 / 30 (gap median 0.15 mm, max 0.63 mm), dampers 30 / 30; sustain pedal vs MIDI CC64 r = 1.000; right foot vs pedal r = -0.9995 |
@@ -156,7 +156,7 @@ FFmpeg 8 (with libx264 and libmp3lame) on the PATH, Python 3.11 and Git LFS.
 
 ```powershell
 git lfs install
-git clone {{REPO_URL}}.git afterglow
+git clone https://github.com/Leonxlnx/afterglow.git afterglow
 cd afterglow
 npm ci                                                     # three 0.186.1, puppeteer-core 25.15.0
 python -m venv .venv
@@ -169,10 +169,10 @@ also attached to the release: clone without them, then put them at the same path
 notes is the `oid` in the pointer file.
 
 ```powershell
-$env:GIT_LFS_SKIP_SMUDGE = '1'; git clone {{REPO_URL}}.git afterglow; Remove-Item Env:GIT_LFS_SKIP_SMUDGE
+$env:GIT_LFS_SKIP_SMUDGE = '1'; git clone https://github.com/Leonxlnx/afterglow.git afterglow; Remove-Item Env:GIT_LFS_SKIP_SMUDGE
 cd afterglow
-curl.exe -L -o assets/pianist/pianist.glb {{GLB_URL}}
-curl.exe -L -o music/ir/detmold_konzerthaus_revc4_r2_stereo.wav {{IR_URL}}   # optional: the released mix does not use it
+curl.exe -L -o assets/pianist/pianist.glb https://github.com/Leonxlnx/afterglow/releases/download/v1.0/pianist.glb
+curl.exe -L -o music/ir/detmold_konzerthaus_revc4_r2_stereo.wav https://github.com/Leonxlnx/afterglow/releases/download/v1.0/detmold_konzerthaus_revc4_r2_stereo.wav   # optional: the released mix does not use it
 (Get-FileHash assets/pianist/pianist.glb).Hash                                 # compare with the release notes
 ```
 
@@ -189,7 +189,7 @@ tar -xjf SalamanderGrandPianoV3_48khz24bit.tar.bz2 -C music\samples\SalamanderGr
 The score in `music/final/` is the frozen, approved version; `.venv\Scripts\python music\afterglow_score.py`
 regenerates it from the note-by-note source.
 
-**Performance.** Download the performance tracks of the film ([afterglow_perf_g1f.zip]({{PERF_URL}}): `perf.json`,
+**Performance.** Download the performance tracks of the film ([afterglow_perf_g1f.zip](https://github.com/Leonxlnx/afterglow/releases/download/v1.0/afterglow_perf_g1f.zip): `perf.json`,
 `perf.bin`, `qc.json`) and unpack them into `build/anim/`. These are the exact tracks the film was rendered with; the
 committed camera hand track and motion-blur table are keyed to them.
 
