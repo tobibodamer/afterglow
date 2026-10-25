@@ -1,0 +1,103 @@
+AFTERGLOW (arranger candidate): validator report
+
+SECTIONS (t_start - t_end, seconds)
+  intro    bars  1- 4     0.00 -   15.33  ( 15.3s)
+  verse1   bars  5-12    15.33 -   40.32  ( 25.0s)
+  pre1     bars 13-16    40.32 -   52.84  ( 12.5s)
+  chorus1  bars 17-24    52.84 -   77.42  ( 24.6s)
+  verse2   bars 25-28    77.42 -   89.72  ( 12.3s)
+  pre2     bars 29-32    89.72 -  102.01  ( 12.3s)
+  chorus2  bars 33-40   102.01 -  126.60  ( 24.6s)
+  bridge   bars 41-48   126.60 -  152.56  ( 26.0s)
+  build    bars 49-52   152.56 -  165.42  ( 12.9s)
+  climax   bars 53-60   165.42 -  189.41  ( 24.0s)
+  tag      bars 61-62   189.41 -  196.63  (  7.2s)
+  finalA   bars 63-66   196.63 -  211.13  ( 14.5s)
+  coda     bars 67-69   211.13 -  226.58  ( 15.4s)
+last note-off 226.56s = 3:46.6; notes=1090; balance pass lowered 27 accompaniment notes; 144 key releases tidied
+
+DSL Score.check(): 0 issues
+
+sketch extra_checks(): 0 issues
+melody onsets < 6 vel above simultaneous accompaniment (sketch metric): 0
+
+arranger checks (arr_tools.my_checks): 0 issues
+notes:
+  duration to last note-off 226.56s = 3:46.6
+  apex F6 x1 at 181.2s = 80.0% of the piece
+  tempo chorus1: median 78.1 bpm, max dev 0.67%
+  tempo verse2: median 78.1 bpm, max dev 0.66%
+  tempo pre2: median 78.1 bpm, max dev 0.66%
+  tempo chorus2: median 78.1 bpm, max dev 0.78%
+  tempo climax: median 80.1 bpm, max dev 0.87%
+
+checklist review checks (arr_tools.review_checks): 0 issues
+notes:
+  drop before bar 17: silence 535 ms (keys up 51.88s, dampers down 51.87s, lone pickup 52.42s)
+  drop before bar 53: silence 880 ms (keys up 164.16s, dampers down 164.14s, lone pickup 165.04s)
+  last chord: struck 219.70s, keys up 226.56s, pedal release 226.58s -> 227.28s: ring 6.9s + 0.70s ramp
+  pedal up   51.87-  52.95s (1078 ms) bar 16
+  pedal up   64.69-  65.24s ( 547 ms) bar 20
+  pedal up   76.99-  77.53s ( 547 ms) bar 24
+  pedal up   89.29-  89.83s ( 543 ms) bar 28
+  pedal up  164.14- 165.53s (1390 ms) bar 52
+  pedal up  188.70- 189.52s ( 812 ms) bar 60
+  bass line bars 5-12: Eb2 D2 C2 Bb1 Eb2 Ab1 Ab1 G1 F#1 F1 Bb1  steps 6/9 = 67%
+  bass line bars 13-16: F1 G1 Ab1 A1 Bb1 Bb1  steps 4/4 = 100%
+  bass line bars 29-32: F1 G1 Ab1 A1 Bb1 Bb1  steps 4/4 = 100%
+  anticipations chorus1: 6 in 8 bars; 2-bar spans without one: []
+  anticipations verse2: 2 in 4 bars; 2-bar spans without one: []
+  anticipations pre2: 0 in 4 bars; 2-bar spans without one: [(29, 30), (31, 32)]
+  anticipations chorus2: 7 in 8 bars; 2-bar spans without one: []
+  anticipations climax: 9 in 8 bars; 2-bar spans without one: []
+  RH thumb on a black key inside a step-wise run: 0 []
+  dynamics intro   : melody 41-61 (mean  50.4), accompaniment mean  29.5
+  dynamics verse1  : melody 47-75 (mean  59.2), accompaniment mean  34.9
+  dynamics pre1    : melody 52-81 (mean  66.8), accompaniment mean  40.4
+  dynamics chorus1 : melody 63-89 (mean  75.4), accompaniment mean  48.0
+  dynamics verse2  : melody 57-79 (mean  67.2), accompaniment mean  44.1
+  dynamics pre2    : melody 63-92 (mean  76.3), accompaniment mean  50.9
+  dynamics chorus2 : melody 67-96 (mean  82.6), accompaniment mean  55.5
+  dynamics bridge  : melody 50-74 (mean  62.8), accompaniment mean  40.6
+  dynamics build   : melody 62-116 (mean  89.2), accompaniment mean  66.3
+  dynamics climax  : melody 86-117 (mean  99.0), accompaniment mean  78.4
+  dynamics tag     : melody 51-102 (mean  88.5), accompaniment mean  72.6
+  dynamics finalA  : melody 34-60 (mean  47.0), accompaniment mean  27.8
+  dynamics coda    : melody 36-54 (mean  47.2), accompaniment mean  29.1
+
+INNER MOTION (stepwise accompaniment moves per 4 bars; need >= 2)
+  bars  1- 4: 6
+  bars  5- 8: 9
+  bars  9-12: 9
+  bars 13-16: 10
+  bars 17-20: 7
+  bars 21-24: 7
+  bars 25-28: 5
+  bars 29-32: 11
+  bars 33-36: 9
+  bars 37-40: 14
+  bars 41-44: 6
+  bars 45-48: 5
+  bars 49-52: 3
+  bars 53-56: 16
+  bars 57-60: 10
+  bars 61-64: 3
+  bars 65-68: 3
+  bars 69-69: 0   <-- LOW
+
+MELODY STATS per section
+  intro    {'range': 'Bb4-G5', 'span_st': 9, 'notes': 13, 'repeated': 0, 'steps': 10, 'leaps_ge4': 1, 'vel': '41-61'}
+  verse1   {'range': 'F4-Eb5', 'span_st': 10, 'notes': 41, 'repeated': 6, 'steps': 14, 'leaps_ge4': 2, 'vel': '47-75'}
+  pre1     {'range': 'Bb4-G5', 'span_st': 9, 'notes': 22, 'repeated': 3, 'steps': 12, 'leaps_ge4': 0, 'vel': '52-81'}
+  chorus1  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 39, 'repeated': 1, 'steps': 25, 'leaps_ge4': 2, 'vel': '63-89'}
+  verse2   {'range': 'F4-Eb5', 'span_st': 10, 'notes': 27, 'repeated': 4, 'steps': 11, 'leaps_ge4': 1, 'vel': '57-79'}
+  pre2     {'range': 'Bb4-G5', 'span_st': 9, 'notes': 26, 'repeated': 6, 'steps': 14, 'leaps_ge4': 0, 'vel': '63-92'}
+  chorus2  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 39, 'repeated': 1, 'steps': 24, 'leaps_ge4': 2, 'vel': '67-96'}
+  bridge   {'range': 'G4-Ab5', 'span_st': 13, 'notes': 28, 'repeated': 1, 'steps': 13, 'leaps_ge4': 2, 'vel': '50-74'}
+  build    {'range': 'C4-C6', 'span_st': 24, 'notes': 18, 'repeated': 3, 'steps': 1, 'leaps_ge4': 4, 'vel': '62-116'}
+  climax   {'range': 'C5-F6', 'span_st': 17, 'notes': 39, 'repeated': 2, 'steps': 25, 'leaps_ge4': 3, 'vel': '86-117'}
+  tag      {'range': 'C5-A5', 'span_st': 9, 'notes': 6, 'repeated': 0, 'steps': 3, 'leaps_ge4': 0, 'vel': '51-102'}
+  finalA   {'range': 'C5-A5', 'span_st': 9, 'notes': 17, 'repeated': 1, 'steps': 11, 'leaps_ge4': 1, 'vel': '34-60'}
+  coda     {'range': 'C5-A5', 'span_st': 9, 'notes': 8, 'repeated': 0, 'steps': 5, 'leaps_ge4': 1, 'vel': '36-54'}
+
+RFIY 4-interval window matches: 0; strict +-1 neighbour oscillations: 0

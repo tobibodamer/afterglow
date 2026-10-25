@@ -1,0 +1,6 @@
+{
+ "_comment": "Measured hall instead of the synthetic IR: Detmold Konzerthaus RevC4 (CC BY 4.0, credit in music/ir/README.md). Narrower stereo (two omni capsules 10 cm apart).",
+ "reverb": "music/ir/detmold_konzerthaus_revc4_r2_stereo.wav",
+ "reverb_wet_db": -9.0,
+ "target_lufs": -16.0
+}

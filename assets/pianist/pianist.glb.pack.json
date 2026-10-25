@@ -1,0 +1,389 @@
+{
+ "src": "pianist_raw.glb",
+ "out": "test10.glb",
+ "bytes": 24137400,
+ "mb": 23.02,
+ "textureBytes": 15703846,
+ "seconds": 3.828,
+ "versions": {
+  "gltfTransform": "4.2.1",
+  "meshoptimizer": "0.25.0"
+ },
+ "meshes": [
+  {
+   "name": "Pianist.beard_cap",
+   "prims": [
+    {
+     "verts": 634,
+     "tris": 396,
+     "material": "pianist_beard",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "COLOR_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist.beard_strands",
+   "prims": [
+    {
+     "verts": 60568,
+     "tris": 47568,
+     "material": "pianist_beard",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "COLOR_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "base",
+   "prims": [
+    {
+     "verts": 73116,
+     "tris": 144128,
+     "material": "pianist_skin",
+     "attributes": [
+      "_THICK",
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    },
+    {
+     "verts": 52882,
+     "tris": 102272,
+     "material": "pianist_skin_hand",
+     "attributes": [
+      "_THICK",
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    },
+    {
+     "verts": 810,
+     "tris": 1280,
+     "material": "pianist_sock",
+     "attributes": [
+      "_THICK",
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "eyebrow001",
+   "prims": [
+    {
+     "verts": 124,
+     "tris": 192,
+     "material": "Pianist.eyebrow001",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "eyelashes01",
+   "prims": [
+    {
+     "verts": 250,
+     "tris": 368,
+     "material": "Pianist.eyelashes01",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist.hair_strands",
+   "prims": [
+    {
+     "verts": 195402,
+     "tris": 182462,
+     "material": "pianist_hair",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "COLOR_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "high-poly",
+   "prims": [
+    {
+     "verts": 4187,
+     "tris": 8160,
+     "material": "Pianist.high-poly",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "male_elegantsuit01",
+   "prims": [
+    {
+     "verts": 127381,
+     "tris": 248448,
+     "material": "pianist_lining",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    },
+    {
+     "verts": 129026,
+     "tris": 251712,
+     "material": "pianist_suit",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist.scalp_cap",
+   "prims": [
+    {
+     "verts": 1669,
+     "tris": 1036,
+     "material": "pianist_hair",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "COLOR_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist.shirt_cuff.L",
+   "prims": [
+    {
+     "verts": 600,
+     "tris": 1120,
+     "material": "pianist_shirt",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist.shirt_cuff.R",
+   "prims": [
+    {
+     "verts": 600,
+     "tris": 1120,
+     "material": "pianist_shirt",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "shoes04",
+   "prims": [
+    {
+     "verts": 7008,
+     "tris": 13280,
+     "material": "pianist_shoes",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pianist_nails",
+   "prims": [
+    {
+     "verts": 7190,
+     "tris": 12040,
+     "material": "pianist_nail",
+     "attributes": [
+      "NORMAL",
+      "JOINTS_0",
+      "_THICK",
+      "POSITION",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+     ]
+    }
+   ]
+  }
+ ],
+ "textures": [
+  {
+   "name": "Aksel_Skin_NRM",
+   "mime": "image/webp",
+   "bytes": 1097282,
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  {
+   "name": "Aksel_Skin_diffuse",
+   "mime": "image/webp",
+   "bytes": 272878,
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  {
+   "name": "eyebrow001",
+   "mime": "image/webp",
+   "bytes": 37940,
+   "size": [
+    512,
+    512
+   ]
+  },
+  {
+   "name": "eyelashes01",
+   "mime": "image/webp",
+   "bytes": 26304,
+   "size": [
+    512,
+    512
+   ]
+  },
+  {
+   "name": "brown_eye",
+   "mime": "image/webp",
+   "bytes": 40342,
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  {
+   "name": "suit_nearblack_pinstripe",
+   "mime": "image/webp",
+   "bytes": 864250,
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  {
+   "name": "shoes04_normal",
+   "mime": "image/webp",
+   "bytes": 178114,
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  {
+   "name": "shoes04_black_socks",
+   "mime": "image/webp",
+   "bytes": 101880,
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  {
+   "name": "hand_albedo",
+   "mime": "image/webp",
+   "bytes": 1236068,
+   "size": [
+    6144,
+    3072
+   ]
+  },
+  {
+   "name": "hand_normal",
+   "mime": "image/webp",
+   "bytes": 8286652,
+   "size": [
+    6144,
+    3072
+   ]
+  },
+  {
+   "name": "hand_orm",
+   "mime": "image/webp",
+   "bytes": 948142,
+   "size": [
+    6144,
+    3072
+   ]
+  },
+  {
+   "name": "suit_normal",
+   "mime": "image/webp",
+   "bytes": 2613994,
+   "size": [
+    4096,
+    4096
+   ]
+  }
+ ]
+}

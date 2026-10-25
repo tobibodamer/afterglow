@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Afterglow render page</title>
+<style>html, body { margin: 0; background: #000; overflow: hidden; } canvas { display: block; max-width: 100vw; max-height: 100vh; }</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+// window.AG = { init(opts), renderFrame(frame, opts), readPixels(), info(), renderStill(frame, opts), flush(), present(),
+//               setCamera(o), setLUT(src), setGrade(g) }   (DESIGN.md section 5; docs/RENDERING.md)
+// The Node driver (render/) calls these one frame at a time; nothing here runs a loop.
+// Interactive preview in a normal browser (node render/serve.mjs):
+//   /scene/index.html?preview&frame=600&N=4&w=960&h=540[&placeholders][&debug=coc]
+import { createFilm } from './src/main.js';
+const AG = createFilm();
+window.AG = AG;
+AG.ready = true;
+
+const q = new URLSearchParams(location.search);
+if (q.has('preview')) {
+  (async () => {
+    const w = +(q.get('w') || 960), h = +(q.get('h') || 540);
+    const info = await AG.init({ width: w, height: h, quality: q.get('quality') || 'preview', modules: q.has('placeholders') ? 'placeholders' : 'auto' });
+    console.log('[AG] init', info);
+    const frame = +(q.get('frame') || 0);
+    const res = await AG.renderFrame(frame, { N: q.has('N') ? +q.get('N') : undefined, debugView: q.get('debug') || 'none' });
+    AG.present();
+    console.log('[AG] frame', res);
+  })().catch((e) => { console.error(e); document.body.insertAdjacentHTML('beforeend', `<pre style="color:#f88">${e.stack || e}</pre>`); });
+}
+</script>
+</body>
+</html>

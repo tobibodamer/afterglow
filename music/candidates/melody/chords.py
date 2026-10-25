@@ -1,0 +1,61 @@
+"""Chord tables for the melody candidate. Bass = LH 5th finger (struck, released, pedal-held);
+shell = LH upper notes (Bb2..Eb4); pool = notes the RH may add under the melody."""
+from lib import C
+
+EB = {
+    "I9":     C("Ebadd9", "I", "Eb2", ["Bb2", "G3"], ["Eb4", "F4", "G4", "Bb4"], mv="F3"),
+    "I9h":    C("Ebadd9", "I", "Eb2", ["G3", "Bb3"], ["Eb4", "F4", "G4", "Bb4"], mv="Ab3"),
+    "V6":     C("Bb/D", "V6", "D2", ["F3", "Bb3"], ["D4", "F4", "Bb4"], mv="C4"),
+    "vi9":    C("Cm9", "vi9", "C2", ["Eb3", "Bb3"], ["D4", "G4", "Bb4", "C5"], mv="C4"),
+    "v9":     C("Bbm9", "v9", "Bb1", ["Db3", "Ab3"], ["C4", "F4", "Ab4", "Db5"]),
+    "I7b9":   C("Eb7b9", "I7", "Eb2", ["G3", "Db4"], ["E4", "Bb4", "Db5"]),
+    "IV9":    C("Abmaj9", "IVmaj9", "Ab1", ["C3", "G3"], ["Eb4", "G4", "Ab4", "Bb4", "C5", "Eb5"], mv="Bb3"),
+    "iv6":    C("Abm6", "iv6", "Ab1", ["Cb3", "F3"], ["Eb4", "F4", "Ab4"]),
+    "I6":     C("Eb/G", "I6", "G1", ["Eb3", "Bb3"], ["G4", "Bb4", "Eb5"]),
+    "bIIIo7": C("Gbdim7", "bIIIo7", "Gb1", ["Eb3", "A3"], ["C4", "Eb4", "A4"]),
+    "ii11":   C("Fm11", "ii11", "F1", ["Eb3", "Ab3"], ["Bb3", "C4", "Eb4", "F4"]),
+    "V7sus":  C("Bb9sus4", "V9sus4", "Bb1", ["Eb3", "Ab3"], ["C4", "F4", "Ab4", "C5"]),
+    "V13sus": C("Bb13sus4", "V13sus4", "Bb1", ["Ab3", "C4"], ["F4", "G4", "C5"]),
+    "V13":    C("Bb7(13)", "V7(13)", "Bb1", ["D3", "Ab3"], ["F4", "G4", "C5"]),
+    "iii7":   C("Gm7", "iii7", "G1", ["F3", "Bb3"], ["D4", "F4", "G4", "Bb4"]),
+    "vi9/5":  C("Cm9/Bb", "vi9/5", "Bb1", ["Eb3", "G3"], ["C4", "D4", "G4", "C5"]),
+    "V42":    C("Bb/Ab", "V4/2", "Ab1", ["D3", "F3", "Bb3"], ["Bb4", "D5", "F5"]),
+    "V7/ii":  C("C7b9", "V7b9/ii", "C2", ["E3", "Bb3"], ["G4", "Bb4", "Db5"]),
+    "ii9":    C("Fm9", "ii9", "F1", ["Eb3", "Ab3"], ["G4", "Ab4", "C5", "Eb5"]),
+    "IVadd9": C("Ab(add9)", "IV(add9)", "Ab1", ["Eb3", "C4"], ["Ab4", "Bb4", "C5"]),
+    "#ivo7":  C("Adim7", "#ivo7", "A1", ["Eb3", "Gb3"], ["C4", "Eb4", "A4", "C5", "Eb5"]),
+}
+CM = {
+    "i9":     C("Cm9", "i9", "C2", ["Eb3", "Bb3"], ["D4", "G4", "Bb4"], mv="C4"),
+    "VI#11":  C("Abmaj7#11", "VImaj7#11", "Ab1", ["C3", "G3"], ["C4", "D4", "Eb4", "G4"], mv="Bb3"),
+    "iv9":    C("Fm9", "iv9", "F1", ["Eb3", "Ab3"], ["C4", "Eb4", "G4", "Ab4", "C5"], mv="G3"),
+    "V7sus":  C("G7sus4", "V7sus4", "G1", ["F3", "C4"], ["D4", "G4"]),
+    "V7b9":   C("G7b9", "V7b9", "G1", ["D3", "F3"], ["D4", "Ab4", "D5"]),
+    "i(9)":   C("Cm(add9)", "i(add9)", "C2", ["Eb3", "C4"], ["D4", "G4", "Bb4"]),
+    "i(M7)":  C("Cm(maj7)", "i(maj7)", "C2", ["Eb3", "B3"], ["D4", "G4", "Bb4"]),
+    "i7":     C("Cm7", "i7", "C2", ["Eb3", "Bb3"], ["D4", "G4", "C5"]),
+    "i6":     C("Cm6", "i6", "C2", ["Eb3", "A3"], ["D4", "G4", "C5"]),
+    "VI9":    C("Abmaj9", "VImaj9", "Ab1", ["C3", "G3"], ["Bb4", "C5", "Eb5"]),
+    "iv9b":   C("Fm9", "iv9", "F1", ["Eb3", "Ab3"], ["G4", "Ab4", "C5"]),
+    "iio7":   C("Dm7b5", "iiø7", "D2", ["F3", "C4"], ["F4", "Ab4"]),
+    # build over a C pedal (= V of F)
+    "bVI/C":  C("Abmaj7/C", "bVI/V", "C2", ["C3"], []),
+    "bVII/C": C("Bb/C", "bVII/V", "C2", ["C3"], []),
+    "V7sus/F": C("C7sus4", "V7sus4 (of F)", "C2", ["C3"], []),
+    "V7b9/F": C("C7b9", "V7b9 (of F)", "C2", ["C3"], []),
+}
+FM = {
+    "IV9":    C("Bbmaj9", "IVmaj9", "Bb1", ["D3", "A3"], ["F4", "A4", "C5", "D5", "F5"], mv="C4"),
+    "V13sus": C("C13sus4", "V13sus4", "C2", ["Bb3", "D4"], ["F4", "G4", "A4", "D5"]),
+    "V13":    C("C7(13)", "V7(13)", "C2", ["E3", "Bb3"], ["G4", "A4", "D5"]),
+    "iii7":   C("Am7", "iii7", "A1", ["G3", "C4"], ["E4", "G4", "A4", "C5"]),
+    "vi9":    C("Dm9", "vi9", "D2", ["F3", "C4"], ["E4", "F4", "A4", "C5"], mv="E3"),
+    "vi9/5":  C("Dm9/C", "vi9/5", "C2", ["F3", "A3"], ["D4", "E4", "A4", "D5"]),
+    "V42":    C("C/Bb", "V4/2", "Bb1", ["E3", "G3", "C4"], ["G4", "C5", "E5", "G5", "C6"]),
+    "V7/ii":  C("D7b9", "V7b9/ii", "D2", ["F#3", "C4"], ["A4", "C5", "Eb5", "F#5"]),
+    "ii9":    C("Gm9", "ii9", "G1", ["F3", "Bb3"], ["A4", "Bb4", "D5", "F5"]),
+    "V7sus":  C("C9sus4", "V9sus4", "C2", ["F3", "Bb3"], ["G4", "Bb4", "D5"]),
+    "I9":     C("Fadd9", "I(add9)", "F1", ["C3", "G3", "A3"], ["C5", "F5", "G5", "A4"]),
+    "I/3":    C("Fmaj7/A", "Imaj7/3", "A1", ["F3", "C4", "E4"], ["A4", "C5", "F5"]),
+    "iv6":    C("Bbm6", "iv6", "Bb1", ["Db3", "G3"], ["F4", "Bb4", "Db5"], mv="F3"),
+}

@@ -1,0 +1,102 @@
+AFTERGLOW (melody candidate)  seed=20261021  notes=1178  last note-off 226.12s = 3:46.1
+SECTIONS
+  intro    bars  1- 4     0.00 -   15.09 ( 15.1s)
+  verse1   bars  5-12    15.09 -   40.08 ( 25.0s)
+  pre1     bars 13-16    40.08 -   52.65 ( 12.6s)
+  chorus1  bars 17-24    52.65 -   77.24 ( 24.6s)
+  verse2   bars 25-28    77.24 -   89.53 ( 12.3s)
+  pre2     bars 29-32    89.53 -  101.83 ( 12.3s)
+  chorus2  bars 33-40   101.83 -  126.43 ( 24.6s)
+  bridge   bars 41-48   126.43 -  152.38 ( 26.0s)
+  build    bars 49-52   152.38 -  165.24 ( 12.9s)
+  climax   bars 53-60   165.24 -  189.24 ( 24.0s)
+  tag      bars 61-62   189.24 -  196.45 (  7.2s)
+  finalA   bars 63-66   196.45 -  210.94 ( 14.5s)
+  coda     bars 67-69   210.94 -  226.13 ( 15.2s)
+
+[DSL Score.check()] 0 issues
+
+[sketch.extra_checks] 0 issues; melody onsets < 6 vel above accompaniment: 0
+[sketch.rfiy_overlap] RFIY 4-interval window matches: 0; +-1 neighbour oscillations: 0
+
+[playability] 0 issues
+  info: fingers: 1178/1178 notes fingered; RH thumb-on-black-in-run: 0
+
+[melody] 0 issues
+  info: melody prominence: worst margin 12 (need >= 12), weak onsets 0
+
+[structure] 0 issues
+  info: duration to last note-off: 226.12s = 3:46.1
+  info: apex F6 x1 at 180.6s = 79.9% (climax)
+  info: melody max velocity per section: intro 59, verse1 69, pre1 76, chorus1 90, verse2 75, pre2 85, chorus2 97, bridge 75, build 97, climax 113, tag 95, finalA 56, coda 56
+  info: ghost notes: 42, velocity 23-32
+  info: pedal: 97 harmony changes, 130 marks, early-released bass not caught: 0
+
+[groove] 0 issues
+  info: tempo chorus1: median 78.16 bpm, max deviation 0.67% (beat-level incl. jitter-free map)
+  info: tempo verse2: median 78.15 bpm, max deviation 0.19% (beat-level incl. jitter-free map)
+  info: tempo pre2: median 78.12 bpm, max deviation 0.18% (beat-level incl. jitter-free map)
+  info: tempo chorus2: median 78.16 bpm, max deviation 0.69% (beat-level incl. jitter-free map)
+  info: tempo climax: median 80.10 bpm, max deviation 0.40% (beat-level incl. jitter-free map)
+
+[texture] 0 issues
+  info: longest verbatim 2-bar LH repetition: 1x
+  info: stepwise inner-voice moves per 4 bars: [3, 8, 7, 9, 4, 5, 4, 8, 9, 10, 6, 7, 8, 5, 4, 2, 2, 3]
+  info: bass line verse1: 6/10 moves are steps or chromatic approaches
+  info: bass line pre1: 5/5 moves are steps or chromatic approaches
+  info: bass line verse2: 4/5 moves are steps or chromatic approaches
+  info: bass line pre2: 4/4 moves are steps or chromatic approaches
+
+[voice-leading] 0 issues
+  info: outer-voice parallel 5ths/8ves (outside the octave-doubled bars): 0
+
+[pedal-mud] 0 issues
+  info: pedal-aware low-register clashes: 0
+
+voicing pass: 59 accompaniment velocities lowered to keep the melody >= 12 above
+
+MELODY STATS (sketch.melody_stats)
+  intro    {'range': 'Bb4-Ab5', 'span_st': 10, 'notes': 14, 'repeated': 1, 'steps': 7, 'leaps_ge4': 3, 'vel': '42-59'}
+  verse1   {'range': 'F4-Eb5', 'span_st': 10, 'notes': 47, 'repeated': 10, 'steps': 21, 'leaps_ge4': 3, 'vel': '41-69'}
+  pre1     {'range': 'Bb4-F#5', 'span_st': 8, 'notes': 23, 'repeated': 8, 'steps': 11, 'leaps_ge4': 0, 'vel': '48-76'}
+  chorus1  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 40, 'repeated': 2, 'steps': 26, 'leaps_ge4': 2, 'vel': '61-90'}
+  verse2   {'range': 'F4-F5', 'span_st': 12, 'notes': 29, 'repeated': 3, 'steps': 16, 'leaps_ge4': 1, 'vel': '56-75'}
+  pre2     {'range': 'Bb4-G5', 'span_st': 9, 'notes': 26, 'repeated': 8, 'steps': 13, 'leaps_ge4': 0, 'vel': '56-85'}
+  chorus2  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 45, 'repeated': 2, 'steps': 32, 'leaps_ge4': 1, 'vel': '67-97'}
+  bridge   {'range': 'G4-Ab5', 'span_st': 13, 'notes': 26, 'repeated': 0, 'steps': 15, 'leaps_ge4': 3, 'vel': '51-75'}
+  build    {'range': 'C5-C#6', 'span_st': 13, 'notes': 17, 'repeated': 3, 'steps': 2, 'leaps_ge4': 3, 'vel': '65-97'}
+  climax   {'range': 'C5-F6', 'span_st': 17, 'notes': 47, 'repeated': 2, 'steps': 32, 'leaps_ge4': 3, 'vel': '78-113'}
+  tag      {'range': 'C5-A5', 'span_st': 9, 'notes': 5, 'repeated': 0, 'steps': 3, 'leaps_ge4': 0, 'vel': '72-95'}
+  finalA   {'range': 'C5-Bb5', 'span_st': 10, 'notes': 18, 'repeated': 1, 'steps': 12, 'leaps_ge4': 1, 'vel': '32-56'}
+  coda     {'range': 'C5-Bb5', 'span_st': 10, 'notes': 9, 'repeated': 0, 'steps': 7, 'leaps_ge4': 0, 'vel': '44-56'}
+
+swing / rubato / offsets per section
+  intro    swing 0.50 rubato 0.90 groove False offsets None
+  verse1   swing 0.51 rubato 0.50 groove False offsets None
+  pre1     swing 0.53 rubato 0.30 groove False offsets None
+  chorus1  swing 0.56 rubato 0.05 groove True offsets {'mel': 14, 'inner': 9, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  verse2   swing 0.57 rubato 0.05 groove True offsets {'mel': 14, 'inner': 9, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  pre2     swing 0.57 rubato 0.05 groove True offsets {'mel': 14, 'inner': 9, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  chorus2  swing 0.58 rubato 0.05 groove True offsets {'mel': 14, 'inner': 9, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  bridge   swing 0.50 rubato 0.60 groove False offsets None
+  build    swing 0.50 rubato 0.00 groove False offsets {'mel': -8, 'inner': -4, 'acc': 0, 'counter': 0, 'bass': 0, 'ghost': 0}
+  climax   swing 0.56 rubato 0.03 groove True offsets {'mel': 10, 'inner': 8, 'acc': 6, 'counter': 6, 'bass': 0, 'ghost': 2}
+  tag      swing 0.50 rubato 0.40 groove False offsets None
+  finalA   swing 0.50 rubato 0.90 groove False offsets None
+  coda     swing 0.50 rubato 0.90 groove False offsets None
+
+SECTION-6 CHECKLIST (measured evidence; written review in PROGRESS.md)
+  1 hook: chorus bars 17-18 (Bb4 leap to G5, turn, 3+3+2 fall | Eb5 sus on the '&' of 1 -> D5); heard in intro 2-3, C1 17/21, C2 33/37 (octaves), climax 53/57 (new apex), final A 63, coda 67 - varied each time
+  2 motifs: gamma in verse 5/7/9/10 + pre 13-15 + chorus 19/23; beta in pre 16 and bridge 44; alpha's leap as a minor 6th in bridge 45; 3+3+2 pocket as the build's top line 49-51; C2 counter (34) = the hook's turn
+  3/4/5 loops, inner motion, bass line: see [texture] info above
+  6 cadences: half (16: V), elided authentic (24 -> 25), deceptive (40 -> 41 vi), C pedal = V of F (49-52), minor plagal Bbmaj9 -> Bbm6 -> Fadd9 (67-69)
+  7 arrivals: silence before chorus 1 0.59s, before climax 0.88s; apex F6 once at 180.6s = 79.9%; loudest section = climax (113)
+  8 melody on top: see [melody] prominence + NOT ON TOP checks above
+ 10 groove: swing 0.56-0.58 (choruses / verse 2 / pre 2), 0.56 climax; ghosts 23-32; backbeat shells on 2 & 4 (choruses), on 3 (bridge)
+ 11 tempo: see [groove] info (groove sections within 1 %)
+ 12 dynamics, melody max per section: intro 59, verse1 69, pre1 76, chorus1 90, verse2 75, pre2 85, chorus2 97, bridge 75, build 97, climax 113, tag 95, finalA 56, coda 56
+ 15 ending: Friberg rit w=0.6 q=2.5 over 67-68; last melody C5 v44; last chord rings 6.2s, then a 0.7s damper ramp; 4-3 (tenor) and 9-3 (RH) resolve inside it
+ 16 duration to last note-off 226.1s = 3:46.1
+ 17 originality: RFIY 4-interval matches 0, neighbour oscillations 0; no vi-IV-I-V, no 8th-note arpeggio loops (every LH bar hand-written). Human A/B listening: NOT done (no audio here)
+
+TOTAL ISSUES: 0

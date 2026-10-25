@@ -1,0 +1,37 @@
+.venv/
+node_modules/
+# sandbox/ is the local working area (scratch, logs, review renders). Exceptions: the three helper scripts that
+# render/snapshot.mjs runs by path (camera hand track + forward kinematics, motion-blur N boost solver) and the
+# score checks that music/afterglow_score.py imports (sandbox/music-research/sketch.py).
+sandbox/*
+!sandbox/camera/
+sandbox/camera/*
+!sandbox/camera/handtrack.mjs
+!sandbox/camera/fk.mjs
+!sandbox/integration/
+sandbox/integration/*
+!sandbox/integration/blurstep.mjs
+!sandbox/music-research/
+sandbox/music-research/*
+!sandbox/music-research/sketch.py
+music/samples/
+build/
+frames/
+*.log
+__pycache__/
+
+# Blender extension index fetched by a tool run (not source)
+ext_index.json
+# reference images: origin/licence unknown, kept local until cleared for publishing
+refs/
+*.blend1
+
+# third-party photo (INRIA RT-0425 Steinway D top view, licence unknown): local input of the
+# optional plan overlay in tools/piano/gen_layout_d.py, never published
+tools/piano/im1.png
+
+# render outputs and scratch that must never be committed (they live under build/ anyway)
+*.mkv
+*.mp4
+*.mov
+*.partial.*

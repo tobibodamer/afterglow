@@ -1,0 +1,8 @@
+{
+ "_comment": "Bigger, wetter hall for the film mix: RT60 ~2.25 s at 1 kHz, wet -7.5 dB.",
+ "reverb": "synth",
+ "reverb_wet_db": -7.5,
+ "reverb_predelay_ms": 26.0,
+ "reverb_rt60": [2.8, 2.7, 2.5, 2.35, 2.25, 2.05, 1.7, 1.2, 0.75],
+ "target_lufs": -16.0
+}

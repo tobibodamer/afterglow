@@ -1,0 +1,15 @@
+import { LAYOUT } from '../../scene/src/piano/layout.js';
+import { createMaterials } from '../../scene/src/piano/materials.js';
+import { buildCase } from '../../scene/src/piano/geom/case.js';
+import { buildKeys } from '../../scene/src/piano/geom/keys.js';
+import { computeStrings } from '../../scene/src/piano/geom/stringing.js';
+import { buildInterior } from '../../scene/src/piano/geom/interior.js';
+import { buildStrings } from '../../scene/src/piano/geom/strings.js';
+import { buildAction } from '../../scene/src/piano/geom/action.js';
+import { buildLegs } from '../../scene/src/piano/geom/legs.js';
+import { buildBench } from '../../scene/src/piano/geom/bench.js';
+const L = LAYOUT; const M = createMaterials(L, {});
+const t = (n, f) => { const a = Date.now(); const r = f(); console.log(n, Date.now() - a, 'ms'); return r; };
+const SS = t('strings', () => computeStrings(L));
+t('case', () => buildCase(L, M)); t('keys', () => buildKeys(L, M)); t('interior', () => buildInterior(L, M, SS));
+t('strings3d', () => buildStrings(L, M, SS)); t('action', () => buildAction(L, M, SS)); t('legs', () => buildLegs(L, M)); t('bench', () => buildBench(L, M));

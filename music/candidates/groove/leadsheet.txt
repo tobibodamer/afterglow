@@ -1,0 +1,138 @@
+  1 [intro     ] Abmaj9 | Eb6             v25-47   MEL Bb4@2.5 G5@3
+                BASS Ab1@1 Eb3@1.5  (#notes 6)
+  2 [intro     ] Abmaj9/Bb | Bb6          v22-64   MEL Eb5@1.5 D5@3
+                BASS Bb1@1 Ab3@1.5 Bb1@3 D3@3.5  (#notes 9)
+  3 [intro     ] Gm7 | F7                 v25-54   MEL Bb4@2.5 F5@3 Eb5@4.5
+                BASS G1@1 F3@1.5 A3@3  (#notes 9)
+  4 [intro     ] Cm9 | Bb7sus4            v20-55   MEL D5@1 Eb5@2.5 C5@3
+                BASS C2@1 Eb3@1.5 Bb1@3 Eb3@3.5  (#notes 11)
+  5 [verse1    ] Eb6 | Fsus2              v25-57   MEL Bb4@1.5 G4@1.75 Bb4@2 C5@2.5 Bb4@3 G4@3.5 F4@4
+                BASS Eb2@1 Bb2@1.75 G3@2.5 F3@3.5 G3@4  (#notes 12)
+  6 [verse1    ] Gm7/D | Fsus4            v28-75   MEL F4@1.5 G4@1.75 Bb4@2 Bb4@2.5 C5@2.75 D5@3 C5@3.75 Bb4@4
+                BASS D2@1 F3@2 C4@3 Bb3@3.5 F3@4  (#notes 14)
+  7 [verse1    ] Cm7 | Ebmaj7             v28-73   MEL G4@1.5 Bb4@1.75 Eb5@2 D5@3 C5@3.5 D5@4
+                BASS C2@1 G2@1.75 Eb3@2.5 D4@3.5 Bb3@4  (#notes 12)
+  8 [verse1    ] Bbm9 | C#dim/Eb          v27-74   MEL C#5@1 C5@1.75 Bb4@2 Ab4@2.5 G4@3
+                BASS Bb1@1 C#3@1.75 Eb2@3 G3@3.75  (#notes 12)
+  9 [verse1    ] Abadd9 | Abmaj9/G        v27-68   MEL Bb4@1.5 C5@1.75 Eb5@2 C5@2.75 Bb4@3 Ab4@3.5 C5@4
+                BASS Ab1@1 Eb3@1.75 C4@2.5 Bb3@3.5 G3@4  (#notes 12)
+ 10 [verse1    ] Abm(add9) | Fdim         v27-70   MEL Bb4@1.5 B4@1.75 Eb5@2 C#5@2.75 B4@3 Bb4@4.5
+                BASS Ab1@1 Eb3@1.75 B3@2.5 Ab3@3.5 F3@4  (#notes 11)
+ 11 [verse1    ] Ebmaj7/G | F#dim7        v33-72   MEL Bb4@1 G4@1.5 Bb4@1.75 Eb5@2 D5@2.75 C5@3 A4@4.5
+                BASS G1@1 Eb3@1.75 F#1@3 Eb3@3.75  (#notes 14)
+ 12 [verse1    ] Fm | Bb7sus4             v30-61   MEL Bb4@1 C5@1.5 Bb4@1.75 Ab4@2 Bb4@3
+                BASS F1@1 C3@1.75 Bb1@3 Eb3@3.75  (#notes 13)
+ 13 [pre1      ] Fm7 | Fm9                v32-69   MEL C5@1.5 C5@1.75 C5@2 Bb4@2.5 C5@2.75 Eb5@3.5
+                BASS F1@1 Eb3@2 Eb3@2.5 F2@3 Eb3@3.5 Eb3@4  (#notes 18)
+ 14 [pre1      ] Gm7 | Gm9                v39-76   MEL D5@1.5 D5@1.75 D5@2 C5@2.5 D5@2.75 F5@3.5
+                BASS G1@1 F3@2 F3@2.5 G2@3 F3@3.5 F3@4  (#notes 18)
+ 15 [pre1      ] Abadd9 | Adim7           v42-80   MEL Eb5@1.5 Eb5@1.75 Eb5@2 F5@2.5 F#5@3 F5@4.5
+                BASS Ab1@1 Eb3@2 Eb3@2.5 A1@3 Eb3@4  (#notes 17)
+ 16 [pre1      ] Abmaj9/Bb | Bb7          v48-80   MEL F5@1 Eb5@1.5 D5@3 Bb4@4.5
+                BASS Bb1@1 Ab3@2 Ab3@2.5 Bb1@3  (#notes 15)
+ 17 [chorus1   ] Abmaj7 | Abmaj9          v26-75   MEL G5@1 F5@2.5 Eb5@2.75 F5@3 Eb5@3.75 Bb4@4.5
+                BASS Ab1@1 Eb3@2 Ab2@2.75 Ab1@3.5 Eb3@4 A1@4.5  (#notes 19)
+ 18 [chorus1   ] Abmaj9/Bb | Bb7/Ab       v25-87   MEL C5@1 Eb5@1.5 D5@3
+                BASS Bb1@1 Ab3@2 Bb1@3 D3@4 Bb2@4.5 Ab1@4.75  (#notes 15)
+ 19 [chorus1   ] Gm7 | G9                 v28-92   MEL Bb4@1.5 Bb4@1.75 C5@2 D5@2.5 F5@3 Eb5@4.5
+                BASS G1@1 F3@2 G2@2.75 G1@3.5 F3@4 B1@4.5  (#notes 18)
+ 20 [chorus1   ] Cm9 | Cm7/A              v19-76   MEL D5@2 C5@3 Bb4@4.5
+                BASS C2@1 Eb3@2 C3@2.75 Bb1@3 Eb3@4 A1@4.5 A1@4.75  (#notes 16)
+ 21 [chorus1   ] Abmaj7 | Abmaj9          v24-88   MEL G5@1 F5@2.5 Eb5@2.75 F5@3 G5@3.5 Bb5@4
+                BASS Ab1@1 Eb3@2 Ab2@2.75 Ab1@3.5 Eb3@4  (#notes 18)
+ 22 [chorus1   ] Bb9/Ab | Gm7             v44-83   MEL C6@1.5 Bb5@3 G5@3.5 F5@4
+                BASS Ab1@1 D3@2 Ab1@3.5 D3@4 G1@4.5  (#notes 17)
+ 23 [chorus1   ] Gm7 | C7/F#              v25-90   MEL D5@1 F5@1.5 Eb5@2.5 E5@3 G5@4 F5@4.5
+                BASS F3@2 C2@3 G2@3.75 E3@4 F#1@4.5  (#notes 17)
+ 24 [chorus1   ] Fm7 | Bb7sus4            v29-79   MEL Eb5@2 C5@2.5 Ab4@3 C5@3.5 Eb5@4
+                BASS F1@1 Eb3@2 F2@2.75 Bb1@3 Eb3@4 Bb1@4.25 C2@4.5 D2@4.75  (#notes 19)
+ 25 [verse2    ] Eb6 | Ebadd9             v24-74   MEL Bb4@1.5 G4@1.75 Bb4@2 C5@2.25 Bb4@2.75 G4@3 F4@3.5
+                BASS Eb2@1 Bb2@2.5 Eb3@3 Eb3@3.75 Bb2@4 Eb2@4.5  (#notes 15)
+ 26 [verse2    ] Bbadd9/D | Bb9/C#        v24-80   MEL F4@1.5 G4@1.75 Bb4@2 Bb4@2.25 C5@2.5 D5@2.75 C5@3.5 Bb4@4
+                BASS D2@1 F3@2.5 D3@3 D3@3.75 F3@4 C#2@4.5  (#notes 18)
+ 27 [verse2    ] Cm7 | Ebmaj7/B           v21-85   MEL G4@1.5 Bb4@1.75 Eb5@2 F5@2.75 Eb5@3 D5@3.5
+                BASS C2@1 Eb3@2.5 G2@3 G2@3.75 Eb3@4 B1@4.5  (#notes 16)
+ 28 [verse2    ] Bbm9 | Eb7/F#            v24-78   MEL C#5@1 C5@1.5 Bb4@1.75 Ab4@2.5 G4@3
+                BASS Bb1@1 C#3@2 F2@2.75 Eb2@3 G3@4 F#1@4.5 F#1@4.75  (#notes 14)
+ 29 [pre2      ] Fm9 | Fm9                v18-73   MEL C5@1.5 C5@1.75 C5@2 Bb4@2.5 C5@2.75 Eb5@3.5
+                BASS F1@1 Eb3@2 F2@2.5 F2@2.75 F1@3.5 Eb3@4 F2@4.5 F#1@4.75  (#notes 22)
+ 30 [pre2      ] Gm9 | Gm9                v19-84   MEL D5@1.5 D5@1.75 D5@2 C5@2.5 D5@2.75 F5@3.5
+                BASS G1@1 F3@2 G2@2.5 G2@2.75 G1@3.5 F3@4 G2@4.5 A1@4.75  (#notes 22)
+ 31 [pre2      ] Ab6 | Adim7              v23-89   MEL Eb5@1.5 Eb5@1.75 Eb5@2 F5@2.5 F#5@3 F5@4.5
+                BASS Ab1@1 Eb3@2 Ab2@2.5 Ab2@2.75 A1@3 Eb3@4 A1@4.5 A1@4.75  (#notes 24)
+ 32 [pre2      ] Abmaj9/Bb | Bb7/A        v26-92   MEL F5@1 Eb5@1.5 D5@3 Bb4@4.5
+                BASS Bb1@1 Ab3@2 Bb2@2.5 Bb2@2.75 Bb1@3 D3@3.5 Bb2@4 Ab2@4.25 F2@4.5 A1@4.75  (#notes 21)
+ 33 [chorus2   ] Abmaj7 | Abmaj9          v21-84   MEL G5@1 F5@2.5 Eb5@2.75 F5@3 G5@3.5 F5@3.75 Eb5@4 Bb4@4.5
+                BASS Ab1@1 Eb3@2 Ab2@2.5 Ab2@2.75 Ab1@3.5 Eb3@4 Bb2@4.5 A1@4.75  (#notes 27)
+ 34 [chorus2   ] Abmaj9/Bb | Bb9          v47-96   MEL C5@1 Eb5@1.5 D5@3
+                BASS Bb1@1 Ab3@2 Bb1@3 F3@3.5 G3@4 Ab3@4.25 C4@4.5  (#notes 15)
+ 35 [chorus2   ] Gm7 | Gm9                v28-105  MEL Bb4@1.5 Bb4@1.75 C5@2 D5@2.25 Eb5@2.5 D5@2.75 F5@3 Eb5@4.5
+                BASS G1@1 F3@2 G2@2.5 G2@2.75 G1@3.5 F3@4 B1@4.5  (#notes 25)
+ 36 [chorus2   ] Cm9 | Bbadd9             v42-90   MEL D5@2 C5@3 Bb4@4.5
+                BASS C2@1 Eb3@2 Bb1@3 G3@3.5 Bb3@3.75 C4@4 D4@4.5  (#notes 15)
+ 37 [chorus2   ] Abmaj7 | Abmaj9          v20-94   MEL G5@1 F5@2.5 Eb5@2.75 F5@3 G5@3.5 Bb5@4
+                BASS Ab1@1 Ab1@2.5 Eb3@4 Ab2@4.5  (#notes 20)
+ 38 [chorus2   ] Abadd9 | Gm7             v44-98   MEL C6@1.5 Bb5@3 G5@3.5 F5@4
+                BASS Ab1@1 Ab1@2.5 F3@4 G1@4.5  (#notes 18)
+ 39 [chorus2   ] Gm7 | F#7                v21-103  MEL D5@1 F5@1.5 Eb5@2.5 E5@3 G5@4 F5@4.5
+                BASS F3@2 G2@2.5 G2@2.75 C2@3 G2@3.75 E3@4 F#1@4.5  (#notes 23)
+ 40 [chorus2   ] Fm7 | Bb7sus4            v24-82   MEL Eb5@2 C5@2.5 Ab4@3 C5@3.5 Eb5@4
+                BASS F1@1 Eb3@2 F2@2.75 Bb1@3 Eb3@3.5  (#notes 15)
+ 41 [bridge    ] Cm | Ebmaj7              v24-61   MEL D5@4 C5@4.5
+                BASS C2@1 G2@2 Eb3@3 D4@4.5  (#notes 8)
+ 42 [bridge    ] Ab | Cm9                 v24-73   MEL D5@1 C5@4 Bb4@4.5
+                BASS Ab1@1 Eb3@2 C3@3 Bb3@4.5  (#notes 9)
+ 43 [bridge    ] F7 | Abmaj7/Eb           v26-68   MEL C5@1 Ab4@3 G4@4
+                BASS F1@1 C3@2 Eb3@3 G3@4.5  (#notes 10)
+ 44 [bridge    ] G7sus4 | G7              v27-75   MEL C5@1 B4@3 Ab4@4
+                BASS G1@1 F3@2 G1@3 F3@3.75  (#notes 11)
+ 45 [bridge    ] Cm | Cm                  v26-70   MEL G4@1 Eb5@2
+                BASS C2@1 Eb3@1.5 C2@3 Eb3@3.5  (#notes 10)
+ 46 [bridge    ] Cm9 | Cm6                v29-80   MEL D5@1 Eb5@2 F5@2.5 G5@3
+                BASS C2@1 Eb3@1.5 C2@3 Eb3@3.5 G3@4.5  (#notes 14)
+ 47 [bridge    ] Abmaj7 | Fm9             v31-84   MEL Ab5@1 G5@3 F5@4
+                BASS Ab1@1 C3@2 F1@3 Eb3@3.75  (#notes 13)
+ 48 [bridge    ] Dm7b5 | G7               v31-78   MEL Ab5@1 F5@2 D5@3 B4@3.5
+                BASS D2@1 F3@1.5 G1@3 F3@3.5  (#notes 12)
+ 49 [build     ] Caug | Cm                v39-71   MEL Eb5@1 Eb5@2.5 G5@4
+                BASS C2@1 C2@2.5 C2@4  (#notes 15)
+ 50 [build     ] Bbadd9/C | Bbadd9/C      v47-87   MEL F5@1 F5@2.5 Bb5@4
+                BASS C2@1 C2@1.5 C2@2 C2@2.5 C2@3 C2@3.5 C2@4 C2@4.5  (#notes 25)
+ 51 [build     ] Cm9 | Cm9                v41-102  MEL G5@1 Ab5@4
+                BASS C2@1 C2@1.5 C2@2 C2@2.5 C2@3 C2@3.5 C2@4 C2@4.5  (#notes 40)
+ 52 [build     ] C7 | C7                  v61-94   MEL C4@1.25 E4@1.5 G4@1.75 Bb4@2 C#5@2.25 E5@2.5 G5@2.75 Bb5@3 C5@4.5
+                BASS C2@1 C2@1.5 C2@2 C2@2.5 C2@3  (#notes 22)
+ 53 [climax    ] Bbmaj7 | Bbmaj9          v60-104  MEL A5@1 G5@2.5 F5@2.75 G5@3 F5@3.75 C5@4.5
+                BASS Bb1@1 Bb1@2.5 F3@4 C2@4.5  (#notes 21)
+ 54 [climax    ] Bbadd9/C | C7            v59-111  MEL D5@1 F5@1.5 E5@3
+                BASS Bb3@2 C2@3 G3@3.5 Bb3@3.75 C4@4  (#notes 15)
+ 55 [climax    ] Am7 | A7sus4             v59-108  MEL C5@1.5 C5@1.75 D5@2 E5@2.25 F5@2.5 E5@2.75 G5@3 F5@4.5
+                BASS A1@1 G3@2 A1@2.5 E3@4 D2@4.5  (#notes 22)
+ 56 [climax    ] Dm9 | Dm7/C              v54-91   MEL E5@2 D5@3 C5@4.5
+                BASS F3@2 C2@3 F3@4  (#notes 16)
+ 57 [climax    ] Bbmaj7 | Bbmaj9          v59-103  MEL A5@1 G5@2.5 F5@2.75 G5@3 A5@3.5 C6@4
+                BASS Bb1@1 D3@2 Bb1@2.5 F3@4 Bb1@4.5  (#notes 24)
+ 58 [climax    ] Bbadd9 | Bbmaj9          v65-115  MEL D6@1.5 F6@2 D6@3.5 C6@4 A5@4.5
+                BASS F3@2 Bb1@2.5 F3@4  (#notes 18)
+ 59 [climax    ] Am7 | Gmaj9              v63-110  MEL E5@1 G5@1.5 F5@2.5 F#5@3 A5@4 G5@4.5
+                BASS A1@1 G3@2 D2@3 F#3@4 G1@4.5  (#notes 25)
+ 60 [climax    ] Gm7 | C9                 v56-103  MEL F5@2 D5@2.5 C5@3 D5@3.5 F5@4 G5@4.5
+                BASS F3@2 C2@3 F3@3.75 C2@4.25 D2@4.5 E2@4.75  (#notes 27)
+ 61 [tag       ] Fadd9 | C6               v51-102  MEL A5@1 G5@3 F5@3.5 C5@4
+                BASS F1@1 C3@2  (#notes 16)
+ 62 [tag       ] Fmaj7/A | F              v38-76   MEL E5@1 C5@4.5
+                BASS A1@1 F3@2  (#notes 9)
+ 63 [finalA    ] Bbmaj9 | Fadd9           v19-49   MEL A5@1 G5@2.5 F5@2.75 G5@3 F5@3.75 C5@4.5
+                BASS Bb1@1 F3@1.5 A3@3  (#notes 11)
+ 64 [finalA    ] Bbmaj9/C | C7            v19-62   MEL D5@1 F5@1.5 E5@3
+                BASS C2@1 Bb3@1.5 C2@3 G3@3.5  (#notes 11)
+ 65 [finalA    ] Am7 | Fmaj9/E            v22-62   MEL C5@1.5 C5@1.75 D5@2 E5@2.5 G5@3 F5@4.5
+                BASS A1@1 E3@1.5  (#notes 11)
+ 66 [finalA    ] Dm9 | Fmaj7              v18-46   MEL E5@2 D5@3 C5@4.5
+                BASS D2@1 F3@1.5 E4@3  (#notes 8)
+ 67 [coda      ] Bbmaj7 | Fadd9           v22-43   MEL A5@1 G5@2.5 F5@2.75 G5@3
+                BASS Bb1@1 F3@1.5 C4@3  (#notes 9)
+ 68 [coda      ] Bbm7 | Gm7b5/F           v18-59   MEL F5@1 C#5@2.5
+                BASS Bb1@1 F3@1.5 G3@3  (#notes 9)
+ 69 [coda      ] Fadd9 | Fadd9/C          v21-45   MEL C5@2
+                BASS F1@1 C3@1.5  (#notes 7)

@@ -1,0 +1,14 @@
+intro          bars   1-  4  t=   0.0s  notes=  36  RH Ab4-Ab5  LH G1-D4  vel 22-59  mel 14
+verse1         bars   5- 12  t=  15.1s  notes= 101  RH Eb4-Eb5  LH F1-C#4  vel 25-69  mel 47
+pre1           bars  13- 16  t=  40.1s  notes=  76  RH F4-F#5  LH F1-Eb4  vel 30-76  mel 23
+chorus1        bars  17- 24  t=  52.7s  notes= 144  RH Eb4-C6  LH F1-Eb4  vel 23-90  mel 40
+verse2         bars  25- 28  t=  77.2s  notes=  75  RH D4-F5  LH F#1-C#4  vel 23-75  mel 29
+pre2           bars  29- 32  t=  89.5s  notes=  81  RH F4-G5  LH F1-Eb4  vel 24-85  mel 26
+chorus2        bars  33- 40  t= 101.8s  notes= 166  RH Eb4-C6  LH F1-Eb4  vel 25-97  mel 45
+bridge         bars  41- 48  t= 126.4s  notes=  97  RH D4-Ab5  LH F1-D4  vel 22-75  mel 26
+build          bars  49- 52  t= 152.4s  notes= 105  RH G4-C#6  LH C2-Bb3  vel 43-97  mel 17
+climax         bars  53- 60  t= 165.2s  notes= 208  RH C4-F6  LH G1-C4  vel 59-113  mel 47
+tag            bars  61- 62  t= 189.2s  notes=  19  RH A4-A5  LH F1-E4  vel 51-95  mel 5
+finalA         bars  63- 66  t= 196.4s  notes=  42  RH G4-Bb5  LH A1-C4  vel 19-56  mel 18
+coda           bars  67- 69  t= 210.9s  notes=  28  RH F4-Bb5  LH F1-C4  vel 17-56  mel 9
+total duration 226.1s, 1178 notes

@@ -1,0 +1,846 @@
+{
+ "file": "E:\\experimentswithclaude\\random\\afterglow\\build\\pianist\\c3r2\\pianist_raw.glb",
+ "bytes": 62225988,
+ "meshes": [
+  {
+   "node": "Pianist_beard_cap",
+   "verts": 634,
+   "tris": 396,
+   "attributes": [
+    "COLOR_0",
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_beard",
+   "bbox_min": [
+    -0.07020000368356705,
+    1.0566999912261963,
+    -0.3569999933242798
+   ],
+   "bbox_max": [
+    0.07360000163316727,
+    1.1713999509811401,
+    -0.241799995303154
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 94,
+     "2": 14,
+     "3": 64,
+     "4": 462
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_beard_strands",
+   "verts": 60568,
+   "tris": 47568,
+   "attributes": [
+    "COLOR_0",
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_beard",
+   "bbox_min": [
+    -0.08299999684095383,
+    1.0439000129699707,
+    -0.36970001459121704
+   ],
+   "bbox_max": [
+    0.0812000036239624,
+    1.1990000009536743,
+    -0.23479999601840973
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 7120,
+     "2": 1730,
+     "3": 4700,
+     "4": 47018
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_body",
+   "verts": 73116,
+   "tris": 144128,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0",
+    "_THICK"
+   ],
+   "material": "pianist_skin",
+   "bbox_min": [
+    -0.22339999675750732,
+    0.7487000226974487,
+    -0.4392000138759613
+   ],
+   "bbox_max": [
+    0.22339999675750732,
+    1.313599944114685,
+    -0.1128000020980835
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 14277,
+     "2": 18199,
+     "3": 15328,
+     "4": 25312
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_body",
+   "verts": 52882,
+   "tris": 102272,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0",
+    "_THICK"
+   ],
+   "material": "pianist_skin_hand",
+   "bbox_min": [
+    -0.20080000162124634,
+    0.7233999967575073,
+    -0.1412999927997589
+   ],
+   "bbox_max": [
+    0.20080000162124634,
+    0.7896000146865845,
+    0.0421999990940094
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 7428,
+     "2": 24494,
+     "3": 10254,
+     "4": 10706
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_body",
+   "verts": 810,
+   "tris": 1280,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0",
+    "_THICK"
+   ],
+   "material": "pianist_sock",
+   "bbox_min": [
+    -0.15219999849796295,
+    0.1396999955177307,
+    -0.05290000140666962
+   ],
+   "bbox_max": [
+    0.19949999451637268,
+    0.24050000309944153,
+    0.05640000104904175
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "2": 157,
+     "3": 653
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_eyebrow001",
+   "verts": 124,
+   "tris": 192,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "Pianist.eyebrow001",
+   "bbox_min": [
+    -0.06120000034570694,
+    1.1397000551223755,
+    -0.23980000615119934
+   ],
+   "bbox_max": [
+    0.05869999900460243,
+    1.1642999649047852,
+    -0.21080000698566437
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "2": 34,
+     "3": 84,
+     "4": 6
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_eyelashes01",
+   "verts": 250,
+   "tris": 368,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "Pianist.eyelashes01",
+   "bbox_min": [
+    -0.05130000039935112,
+    1.1311999559402466,
+    -0.23520000278949738
+   ],
+   "bbox_max": [
+    0.04650000110268593,
+    1.148900032043457,
+    -0.21969999372959137
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 92,
+     "2": 116,
+     "3": 36,
+     "4": 6
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_hair_strands",
+   "verts": 195402,
+   "tris": 182462,
+   "attributes": [
+    "COLOR_0",
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_hair",
+   "bbox_min": [
+    -0.12540000677108765,
+    1.1126999855041504,
+    -0.4239000082015991
+   ],
+   "bbox_max": [
+    0.12639999389648438,
+    1.3600000143051147,
+    -0.12080000340938568
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 116608,
+     "2": 22224,
+     "3": 20722,
+     "4": 35848
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_high-poly",
+   "verts": 4187,
+   "tris": 8160,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "Pianist.high-poly",
+   "bbox_min": [
+    -0.04670000076293945,
+    1.134600043296814,
+    -0.251800000667572
+   ],
+   "bbox_max": [
+    0.04309999942779541,
+    1.1682000160217285,
+    -0.22190000116825104
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 3424,
+     "2": 619,
+     "3": 144
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_male_elegantsuit01",
+   "verts": 127381,
+   "tris": 248448,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_lining",
+   "bbox_min": [
+    -0.3212999999523163,
+    0.050999999046325684,
+    -0.6310999989509583
+   ],
+   "bbox_max": [
+    0.32120001316070557,
+    1.1496000289916992,
+    0.1437000036239624
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 2490,
+     "2": 14641,
+     "3": 28430,
+     "4": 81820
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_male_elegantsuit01",
+   "verts": 129026,
+   "tris": 251712,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_suit",
+   "bbox_min": [
+    -0.32350000739097595,
+    0.0502999983727932,
+    -0.6310999989509583
+   ],
+   "bbox_max": [
+    0.32339999079704285,
+    1.1497999429702759,
+    0.14489999413490295
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 2649,
+     "2": 14722,
+     "3": 28993,
+     "4": 82662
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_scalp_cap",
+   "verts": 1669,
+   "tris": 1036,
+   "attributes": [
+    "COLOR_0",
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_hair",
+   "bbox_min": [
+    -0.0771000012755394,
+    1.1510000228881836,
+    -0.3903000056743622
+   ],
+   "bbox_max": [
+    0.08020000159740448,
+    1.316499948501587,
+    -0.18119999766349792
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 545,
+     "2": 702,
+     "3": 150,
+     "4": 272
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_shirt_cuff_L",
+   "verts": 600,
+   "tris": 1120,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_shirt",
+   "bbox_min": [
+    0.12970000505447388,
+    0.733299970626831,
+    -0.19120000302791595
+   ],
+   "bbox_max": [
+    0.2167000025510788,
+    0.8015000224113464,
+    -0.11400000005960464
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 320,
+     "2": 280
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_shirt_cuff_R",
+   "verts": 600,
+   "tris": 1120,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_shirt",
+   "bbox_min": [
+    -0.2167000025510788,
+    0.733299970626831,
+    -0.19120000302791595
+   ],
+   "bbox_max": [
+    -0.12970000505447388,
+    0.8015000224113464,
+    -0.11400000005960464
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 320,
+     "2": 280
+    },
+    "has_JOINTS_1": false
+   }
+  },
+  {
+   "node": "Pianist_shoes04",
+   "verts": 7008,
+   "tris": 13280,
+   "attributes": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+   ],
+   "material": "pianist_shoes",
+   "bbox_min": [
+    -0.15070000290870667,
+    -0.0020000000949949026,
+    -0.053199999034404755
+   ],
+   "bbox_max": [
+    0.21400000154972076,
+    0.23229999840259552,
+    0.2623000144958496
+   ],
+   "skin": 0,
+   "weights": {
+    "sum_min": 1.0,
+    "sum_max": 1.0,
+    "influences_hist": {
+     "1": 2343,
+     "2": 1293,
+     "3": 2330,
+     "4": 1042
+    },
+    "has_JOINTS_1": false
+   }
+  }
+ ],
+ "skins": [
+  {
+   "joints": 163,
+   "names": [
+    "root",
+    "pelvis_L",
+    "upperleg01_L",
+    "upperleg02_L",
+    "lowerleg01_L",
+    "lowerleg02_L",
+    "foot_L",
+    "toe1-1_L",
+    "toe1-2_L",
+    "toe2-1_L",
+    "toe2-2_L",
+    "toe2-3_L",
+    "toe3-1_L",
+    "toe3-2_L",
+    "toe3-3_L",
+    "toe4-1_L",
+    "toe4-2_L",
+    "toe4-3_L",
+    "toe5-1_L",
+    "toe5-2_L",
+    "toe5-3_L",
+    "pelvis_R",
+    "upperleg01_R",
+    "upperleg02_R",
+    "lowerleg01_R",
+    "lowerleg02_R",
+    "foot_R",
+    "toe1-1_R",
+    "toe1-2_R",
+    "toe2-1_R",
+    "toe2-2_R",
+    "toe2-3_R",
+    "toe3-1_R",
+    "toe3-2_R",
+    "toe3-3_R",
+    "toe4-1_R",
+    "toe4-2_R",
+    "toe4-3_R",
+    "toe5-1_R",
+    "toe5-2_R",
+    "toe5-3_R",
+    "spine05",
+    "spine04",
+    "spine03",
+    "spine02",
+    "breast_L",
+    "breast_R",
+    "spine01",
+    "clavicle_L",
+    "shoulder01_L",
+    "upperarm01_L",
+    "upperarm02_L",
+    "lowerarm01_L",
+    "lowerarm02_L",
+    "wrist_L",
+    "finger1-1_L",
+    "finger1-2_L",
+    "finger1-3_L",
+    "metacarpal1_L",
+    "finger2-1_L",
+    "finger2-2_L",
+    "finger2-3_L",
+    "metacarpal2_L",
+    "finger3-1_L",
+    "finger3-2_L",
+    "finger3-3_L",
+    "metacarpal3_L",
+    "finger4-1_L",
+    "finger4-2_L",
+    "finger4-3_L",
+    "metacarpal4_L",
+    "finger5-1_L",
+    "finger5-2_L",
+    "finger5-3_L",
+    "clavicle_R",
+    "shoulder01_R",
+    "upperarm01_R",
+    "upperarm02_R",
+    "lowerarm01_R",
+    "lowerarm02_R",
+    "wrist_R",
+    "finger1-1_R",
+    "finger1-2_R",
+    "finger1-3_R",
+    "metacarpal1_R",
+    "finger2-1_R",
+    "finger2-2_R",
+    "finger2-3_R",
+    "metacarpal2_R",
+    "finger3-1_R",
+    "finger3-2_R",
+    "finger3-3_R",
+    "metacarpal3_R",
+    "finger4-1_R",
+    "finger4-2_R",
+    "finger4-3_R",
+    "metacarpal4_R",
+    "finger5-1_R",
+    "finger5-2_R",
+    "finger5-3_R",
+    "neck01",
+    "neck02",
+    "neck03",
+    "head",
+    "jaw",
+    "special04",
+    "oris02",
+    "oris01",
+    "oris06_L",
+    "oris07_L",
+    "oris06_R",
+    "oris07_R",
+    "tongue00",
+    "tongue01",
+    "tongue02",
+    "tongue03",
+    "tongue04",
+    "tongue07_L",
+    "tongue07_R",
+    "tongue06_L",
+    "tongue06_R",
+    "tongue05_L",
+    "tongue05_R",
+    "levator02_L",
+    "levator03_L",
+    "levator04_L",
+    "levator05_L",
+    "levator02_R",
+    "levator03_R",
+    "levator04_R",
+    "levator05_R",
+    "special01",
+    "oris04_L",
+    "oris03_L",
+    "oris04_R",
+    "oris03_R",
+    "oris06",
+    "oris05",
+    "special03",
+    "levator06_L",
+    "levator06_R",
+    "special06_L",
+    "special05_L",
+    "eye_L",
+    "orbicularis03_L",
+    "orbicularis04_L",
+    "special06_R",
+    "special05_R",
+    "eye_R",
+    "orbicularis03_R",
+    "orbicularis04_R",
+    "temporalis01_L",
+    "oculi02_L",
+    "oculi01_L",
+    "temporalis01_R",
+    "oculi02_R",
+    "oculi01_R",
+    "temporalis02_L",
+    "risorius02_L",
+    "risorius03_L",
+    "temporalis02_R",
+    "risorius02_R",
+    "risorius03_R"
+   ]
+  }
+ ],
+ "materials": [
+  {
+   "name": "pianist_beard",
+   "baseColorTexture": false,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_skin",
+   "baseColorTexture": true,
+   "normalTexture": true,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_skin_hand",
+   "baseColorTexture": true,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_sock",
+   "baseColorTexture": false,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "Pianist.eyebrow001",
+   "baseColorTexture": true,
+   "normalTexture": true,
+   "mrTexture": false,
+   "alphaMode": "BLEND",
+   "doubleSided": true
+  },
+  {
+   "name": "Pianist.eyelashes01",
+   "baseColorTexture": true,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "BLEND",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_hair",
+   "baseColorTexture": false,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "Pianist.high-poly",
+   "baseColorTexture": true,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "BLEND",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_lining",
+   "baseColorTexture": false,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_suit",
+   "baseColorTexture": true,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_shirt",
+   "baseColorTexture": false,
+   "normalTexture": false,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  },
+  {
+   "name": "pianist_shoes",
+   "baseColorTexture": true,
+   "normalTexture": true,
+   "mrTexture": false,
+   "alphaMode": "OPAQUE",
+   "doubleSided": true
+  }
+ ],
+ "images": [
+  {
+   "name": "Aksel_Skin_NRM",
+   "mime": "image/png",
+   "bytes": 4706189
+  },
+  {
+   "name": "Aksel_Skin_diffuse",
+   "mime": "image/png",
+   "bytes": 4247107
+  },
+  {
+   "name": "hand_placeholder",
+   "mime": "image/png",
+   "bytes": 259
+  },
+  {
+   "name": "eyebrow001",
+   "mime": "image/png",
+   "bytes": 89619
+  },
+  {
+   "name": "eyelashes01",
+   "mime": "image/png",
+   "bytes": 91600
+  },
+  {
+   "name": "brown_eye",
+   "mime": "image/png",
+   "bytes": 610817
+  },
+  {
+   "name": "suit_nearblack_pinstripe",
+   "mime": "image/png",
+   "bytes": 2101006
+  },
+  {
+   "name": "shoes04_normal",
+   "mime": "image/png",
+   "bytes": 875473
+  },
+  {
+   "name": "shoes04_black_socks",
+   "mime": "image/png",
+   "bytes": 826533
+  }
+ ],
+ "animations": []
+}

@@ -1,0 +1,10 @@
+{
+ "_comment": "Closer, brighter, louder pop-piano variant: RT60 ~1.65 s, wet -10 dB, +1.5 dB air shelf at 10 kHz, wider pan, -15 LUFS.",
+ "reverb": "synth",
+ "reverb_wet_db": -10.0,
+ "reverb_predelay_ms": 18.0,
+ "reverb_rt60": [2.0, 1.95, 1.85, 1.75, 1.65, 1.5, 1.3, 0.95, 0.6],
+ "pan_spread": 0.35,
+ "master_high_shelf": [10000.0, 1.5],
+ "target_lufs": -15.0
+}

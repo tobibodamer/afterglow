@@ -1,0 +1,23 @@
+{
+  "name": "afterglow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Afterglow: an offline-rendered three.js solo-piano film (render core, scene, Node render driver).",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "serve": "node render/serve.mjs",
+    "still": "node render/still.mjs",
+    "render": "node render/render.mjs",
+    "encode": "node render/encode.mjs",
+    "determinism": "node render/determinism.mjs --placeholders",
+    "selftest": "node render/selftest.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "25.15.0",
+    "three": "0.186.1"
+  }
+}

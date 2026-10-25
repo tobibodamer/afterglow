@@ -1,0 +1,15 @@
+{
+ "_comment": "FINAL soundtrack mix (recording engineer, 2026-10-21; default of music/render_audio.py). Chosen by measurement (music/mix_meter.py, sandbox/mix/): ballad / pop_intimate / cinematic_hall differ by < 0.6 dB in every spectral metric and are all as dark as the dry Salamander notes (chorus presence 2-5k re 250-1k -21 dB, air 8-16k -64 dB, centroid ~500 Hz: the instrument, not the chain). Pop-piano polish relative to the dry close-mic notes: presence +3.5 dB @ 3.2 kHz, air shelf +5 dB @ 9 kHz, -2 dB @ 250 Hz (measured on the final render, chorus 1 / chorus 2 / climax vs the dry notes: presence +2.7 / +2.8 / +2.9 dB, air +3.4 / +3.2 / +3.2 dB, 150-400 Hz vs 1-4 kHz -3.1 / -3.0 / -2.9 dB; vs the ballad preset: chorus presence +3.6 dB, air +4.6 dB, centroid 505 -> 616 Hz). Room: synthetic hall RT60 1.8 s @ 1 kHz, 20 ms pre-delay, wet -11 dB, send high-passed at 150 Hz (best backbeat articulation of the tested rooms, keeps the bass dry). Melody lift: score voice 'mel' gets +0.15 dB per velocity unit above v64 (loudness only), because the sample layers grow only ~0.15 dB per unit from v60 to v110 and the dense climax buried the hook (B-weighted melody over accompaniment, ballad -> final: climax -1.1 -> +4.0 dB, build 0.5 -> 3.2, tag 2.3 -> 4.6, whole-piece median 4.8 -> 6.9). Mastered to -16 LUFS / -1.2 dBTP (limiter max 4.4 dB, on the climax melody attacks only).",
+ "reverb": "synth",
+ "reverb_wet_db": -11.0,
+ "reverb_predelay_ms": 20.0,
+ "reverb_rt60": [2.2, 2.1, 2.0, 1.9, 1.8, 1.65, 1.4, 1.0, 0.65],
+ "reverb_send_hp_hz": 150.0,
+ "pan_spread": 0.30,
+ "master_eq": [[250.0, -2.0, 0.8], [3200.0, 3.5, 0.7]],
+ "master_high_shelf": [9000.0, 5.0],
+ "melody_voices": ["mel"],
+ "melody_lift_knee": 64.0,
+ "melody_lift_db_per_unit": 0.15,
+ "target_lufs": -16.0
+}

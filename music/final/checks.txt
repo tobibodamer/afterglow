@@ -1,0 +1,179 @@
+AFTERGLOW (definitive score)  seed=20261021  notes=1131  last note-off 220.75s = 3:40.8
+SECTIONS
+  intro    bars  1- 4     0.00 -   15.09 ( 15.1s)
+  verse1   bars  5-12    15.09 -   40.08 ( 25.0s)
+  pre1     bars 13-16    40.08 -   52.65 ( 12.6s)
+  chorus1  bars 17-24    52.65 -   77.24 ( 24.6s)
+  verse2   bars 25-28    77.24 -   89.54 ( 12.3s)
+  pre2     bars 29-32    89.54 -  101.83 ( 12.3s)
+  chorus2  bars 33-40   101.83 -  126.44 ( 24.6s)
+  bridge   bars 41-48   126.44 -  152.40 ( 26.0s)
+  build    bars 49-52   152.40 -  165.25 ( 12.9s)
+  climax   bars 53-60   165.25 -  189.24 ( 24.0s)
+  tag      bars 61-62   189.24 -  196.54 (  7.3s)
+  finalA   bars 63-64   196.54 -  203.78 (  7.2s)
+  coda     bars 65-67   203.78 -  220.76 ( 17.0s)
+
+[DSL Score.check()] 0 issues
+
+[sketch.extra_checks] 0 issues; melody onsets < 6 vel above accompaniment: 0
+[sketch.rfiy_overlap] RFIY 4-interval window matches: 0; +-1 neighbour oscillations: 0
+
+[playability] 0 issues
+  info: fingers: 1131/1131 notes fingered; RH thumb-on-black-in-run: 0
+
+[fingering] 0 issues
+  info: LH counter notes above a held key on fingers 4-5: 0
+
+[melody] 0 issues
+  info: melody prominence: worst margin 12 (need >= 12), weak onsets 0
+
+[structure] 0 issues
+  info: duration to last note-off: 220.75s = 3:40.8
+  info: apex F6 x1 at 180.6s = 81.8% (climax)
+  info: apex velocity 114; loudest other note 110
+  info: melody max velocity per section: intro 57, verse1 69, pre1 84, chorus1 92, verse2 74, pre2 90, chorus2 96, bridge 81, build 88, climax 114, tag 99, finalA 57, coda 54
+  info: ghost notes: 50, velocity 27-32
+  info: pedal: 97 harmony changes, 110 marks, early-released bass not caught: 0
+
+[pedal-policy] 0 issues
+  info: pedal chorus1: dampers on the strings (CC<40) 14.3% of the time, half pedal (40-75) 85.7%, fully lifted (>=76) 0.0%, 0.57 dips/s
+  info: pedal chorus2: dampers on the strings (CC<40) 7.9% of the time, half pedal (40-75) 92.1%, fully lifted (>=76) 0.0%, 0.49 dips/s
+  info: pedal climax: dampers on the strings (CC<40) 9.9% of the time, half pedal (40-75) 3.6%, fully lifted (>=76) 86.5%, 0.63 dips/s
+  info: pedal dips per bar (bars with dips): max 3, mean 1.60; total dips 102
+
+[groove] 0 issues
+  info: tempo chorus1: median 78.14 bpm, max deviation 0.38%
+  info: tempo verse2: median 78.12 bpm, max deviation 0.17%
+  info: tempo pre2: median 78.10 bpm, max deviation 0.16%
+  info: tempo chorus2: median 78.14 bpm, max deviation 0.38%
+  info: tempo climax: median 80.11 bpm, max deviation 0.29%
+  info: micro-timing chorus1: acc/off16 +34ms, acc/on +9ms, bass/on -0ms, ghost/off16 +7ms, inner/on +11ms, mel/off16 +36ms, mel/on +14ms
+  info: micro-timing verse2: acc/on +13ms, bass/on -1ms, counter/off16 +31ms, counter/on +13ms, inner/on +18ms, mel/off16 +42ms, mel/on +20ms
+  info: micro-timing pre2: acc/on +7ms, bass/on +1ms, ghost/off16 +2ms, ghost/on +0ms, inner/on +9ms, mel/off16 +42ms, mel/on +14ms
+  info: micro-timing chorus2: acc/on +7ms, bass/on -2ms, counter/off16 +34ms, counter/on +7ms, ghost/off16 +6ms, ghost/on -1ms, inner/on +12ms, mel/off16 +43ms, mel/on +15ms
+  info: micro-timing climax: acc/on +6ms, bass/on +0ms, counter/on +6ms, ghost/off16 +24ms, inner/on +8ms, mel/off16 +32ms, mel/on +9ms
+
+[texture] 0 issues
+  info: longest verbatim 2-bar LH repetition: 1x
+  info: distinct one-bar LH onset rhythms: 51 in 67 bars
+  info: stepwise inner-voice moves per 4 bars: [5, 8, 9, 12, 9, 8, 9, 10, 10, 7, 3, 6, 6, 11, 7, 5, 6]
+  info: bass line verse1: 6/10 moves are steps or chromatic approaches
+  info: bass line pre1: 5/5 moves are steps or chromatic approaches
+  info: bass line verse2: 4/5 moves are steps or chromatic approaches
+  info: bass line pre2: 5/5 moves are steps or chromatic approaches
+
+[voice-leading] 0 issues
+  info: outer-voice parallel 5ths/8ves (outside the octave-doubled bars): 0
+
+[parallels] 0 issues
+  info: melody/bass parallel 8ves/5ths on consecutive bass attacks: 0
+
+[pedal-mud] 0 issues
+  info: pedal-aware low-register clashes: 0
+
+[clashes] 0 issues
+  info: clash (intended: passing 16th Eb5 between F5 and D5 over Gm7 (against the snare shell's D4, two octaves down)): bar 19 t= 61.33 mel Eb5 vs acc D4 (+13)
+  info: clash (intended: dry chromatic walk-up D2 under the tied sus Eb5, resolving to Eb2 on the next downbeat (the elision)): bar 24 t= 76.87 mel Eb5 vs bass D2 (+37)
+  info: clash (intended: the hook's upper-neighbour 16th Ab5 over the head's octave doubling G4 (fix round 2: chorus 2's head in octaves)): bar 33 t=103.00 mel Ab5 vs inner G4 (+13)
+  info: clash (intended: passing Eb5s inside the gamma run over Gm7 (against the snare shell's D4)): bar 35 t=109.15 mel Eb5 vs acc D4 (+13)
+  info: clash (intended: passing Eb5s inside the gamma run over Gm7 (against the snare shell's D4)): bar 35 t=110.52 mel Eb5 vs acc D4 (+13)
+  info: clash (intended: Ab4 = b9 of G7b9, the bridge's harmonic-minor colour (B4 -> Ab4, the augmented 2nd)): bar 44 t=138.44 mel Ab4 vs bass G1 (+37)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C2 (+37)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C3 (+25)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C2 (+37)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C3 (+25)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C2 (+37)
+  info: clash (intended: Db5 = b9 of C7b9 in the build's sweep over the C pedal): bar 52 t=162.68 mel C#5 vs bass C3 (+25)
+  info: clash (intended: the hook's upper-neighbour 16th Bb5 over its own octave doubling A4 (the shell leaves out A)): bar 53 t=166.38 mel Bb5 vs inner A4 (+13)
+  info: clash (intended: the hook's upper-neighbour 16th Bb5 over its own octave doubling A4 (the shell leaves out A)): bar 57 t=178.37 mel Bb5 vs inner A4 (+13)
+  info: clash (intended: the hook's upper-neighbour 16th Bb5 over its own octave doubling A4 (the tag: the turn lands on I)): bar 61 t=190.41 mel Bb5 vs inner A4 (+13)
+  info: clash (intended: the hook's upper-neighbour 16th Bb5 over its own octave doubling A4 (the tag: the turn lands on I)): bar 61 t=190.41 mel Bb5 vs acc A3 (+25)
+  info: clash (intended: the hook's upper-neighbour 16th Bb5 over its own octave doubling A4 (the tag: the turn lands on I)): bar 61 t=191.41 mel F5 vs counter E3 (+25)
+  info: melody m2/m9 against ringing accompaniment: 17 (0 unexplained)
+
+[arrivals] 0 issues
+  info: drop before bar 17: 0.97s of silence before the Bb4 pickup
+  info: drop before bar 53: 1.25s of silence before the C5 pickup
+  info: arrival bar 17: melody G5 v91 vs peak of the 2 bars before F#5 v84; LH downbeat v73 vs bar 16 max v60; bar energy 15..18 = [4.32, 2.57, 5.39, 2.81]
+  info: arrival bar 33: melody G5 v94 vs peak of the 2 bars before A5 v90; LH downbeat v81 vs bar 32 max v61; bar energy 31..34 = [5.02, 3.59, 7.29, 4.38]
+  info: arrival bar 53: melody A5 v107 vs peak of the 2 bars before G5 v88; LH downbeat v95 vs bar 52 max v69; bar energy 51..54 = [7.51, 6.94, 11.98, 6.51]
+  info: final ring: last melody onset 214.23s, pedal release starts 220.85s -> 6.6s ring; release ramp 0.61s
+
+[density] 0 issues
+  info: notes/s: intro 2.5, verse1 3.8, pre1 6.1, chorus1 6.7, verse2 4.1, pre2 6.7, chorus2 7.2, bridge 3.7, build 7.1, climax 7.6, tag 4.1, finalA 2.9, coda 1.5
+  info: build onsets per bar: LH [4, 11, 11], RH [11, 11, 21, 12]
+
+[key-air] 0 issues
+  info: key releases with the minimum air but under the wanted air (e.g. 140-300 ms for > 24 st): 61
+
+[finger-travel] 0 issues
+  info: same-finger moves: 808, tightest margin -0 ms
+
+[finger-order] 0 issues
+  info: hand states checked: 728
+
+[finger-pins] 0 issues
+  info: pin drops 0, broken states 0
+
+[pedal-clusters] 0 issues
+  info: cluster (intended: D5 and Eb5 = Cm9's 9th and 3rd (the melody climbs through the chord; the m9 voicing)): bar 7 t= 22.66: Eb5 v62 + D5 v65 ring together 1.21s by the pedal
+  info: cluster (intended: D5 and Eb5 = Cm9's 9th and 3rd (verse 2's run through the chord)): bar 27 t= 84.95: D5 v66 + Eb5 v72 ring together 1.20s by the pedal
+  info: longest unexplained pedal-sustained semitone pair (v>=60, above C4): 0.64s (an issue from 0.75s)
+
+[originality] 0 issues
+  info: 4-interval match with My Bonnie Lies Over the Ocean: 5 (bar 5, bar 21, bar 25, bar 35, bar 37)
+  info: originality n-gram scan over 315 melody intervals against 3 reference openings
+
+post passes: {'kicks_straightened': 38, 'apex_capped': 2, 'voicing_adjusted': 13, 'keys_released_for_air': 427, 'pedal_changes_accelerated': 15}
+
+MELODY STATS (sketch.melody_stats)
+  intro    {'range': 'Bb4-G5', 'span_st': 9, 'notes': 10, 'repeated': 0, 'steps': 4, 'leaps_ge4': 2, 'vel': '40-57'}
+  verse1   {'range': 'F4-F5', 'span_st': 12, 'notes': 41, 'repeated': 1, 'steps': 23, 'leaps_ge4': 4, 'vel': '43-69'}
+  pre1     {'range': 'Bb4-Ab5', 'span_st': 10, 'notes': 20, 'repeated': 6, 'steps': 9, 'leaps_ge4': 1, 'vel': '46-84'}
+  chorus1  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 44, 'repeated': 1, 'steps': 29, 'leaps_ge4': 2, 'vel': '59-92'}
+  verse2   {'range': 'F4-F5', 'span_st': 12, 'notes': 21, 'repeated': 0, 'steps': 15, 'leaps_ge4': 1, 'vel': '52-74'}
+  pre2     {'range': 'Bb4-A5', 'span_st': 11, 'notes': 24, 'repeated': 5, 'steps': 13, 'leaps_ge4': 1, 'vel': '52-90'}
+  chorus2  {'range': 'Bb4-C6', 'span_st': 14, 'notes': 45, 'repeated': 1, 'steps': 28, 'leaps_ge4': 2, 'vel': '65-96'}
+  bridge   {'range': 'G4-Ab5', 'span_st': 13, 'notes': 26, 'repeated': 1, 'steps': 10, 'leaps_ge4': 4, 'vel': '50-81'}
+  build    {'range': 'C4-Ab5', 'span_st': 20, 'notes': 22, 'repeated': 5, 'steps': 8, 'leaps_ge4': 2, 'vel': '65-88'}
+  climax   {'range': 'C5-F6', 'span_st': 17, 'notes': 41, 'repeated': 0, 'steps': 26, 'leaps_ge4': 3, 'vel': '80-114'}
+  tag      {'range': 'E5-C6', 'span_st': 8, 'notes': 8, 'repeated': 0, 'steps': 4, 'leaps_ge4': 2, 'vel': '74-99'}
+  finalA   {'range': 'A4-A5', 'span_st': 12, 'notes': 13, 'repeated': 0, 'steps': 7, 'leaps_ge4': 2, 'vel': '40-57'}
+  coda     {'range': 'C5-C5', 'span_st': 0, 'notes': 1, 'repeated': 0, 'steps': 0, 'leaps_ge4': 0, 'vel': '42-42'}
+
+swing / rubato / micro-timing per section
+  intro    swing 0.50 rubato 0.90 groove False offsets None
+  verse1   swing 0.51 rubato 0.50 groove False offsets None
+  pre1     swing 0.53 rubato 0.30 groove False offsets None
+  chorus1  swing 0.56 rubato 0.04 groove True offsets {'mel': 14, 'inner': 10, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  verse2   swing 0.57 rubato 0.04 groove True offsets {'mel': 19, 'inner': 16, 'acc': 12, 'counter': 9, 'bass': 0, 'ghost': 4}
+  pre2     swing 0.57 rubato 0.04 groove True offsets {'mel': 14, 'inner': 10, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  chorus2  swing 0.58 rubato 0.04 groove True offsets {'mel': 14, 'inner': 10, 'acc': 7, 'counter': 6, 'bass': 0, 'ghost': 3}
+  bridge   swing 0.50 rubato 0.60 groove False offsets None
+  build    swing 0.50 rubato 0.00 groove False offsets {'mel': -6, 'inner': -3, 'acc': 0, 'counter': 0, 'bass': 0, 'ghost': 0}
+  climax   swing 0.56 rubato 0.03 groove True offsets {'mel': 9, 'inner': 8, 'acc': 5, 'counter': 5, 'bass': 0, 'ghost': 2}
+  tag      swing 0.50 rubato 0.40 groove False offsets None
+  finalA   swing 0.50 rubato 0.90 groove False offsets None
+  coda     swing 0.50 rubato 0.90 groove False offsets None
+
+SECTION-6 CHECKLIST (measured evidence; written review in PROGRESS_final.md)
+  1 hook: bars 17-18 = Bb4 -> G5 (M6) held, G-Ab-G turn, 3+3+2 fall F5-Eb5-C5 | Bb4 -> Eb5 sus on the '&' of 1 -> D5 on 3. Heard: intro 1-2 (leap, sigh only), C1 17/21, C2 33 (head in octaves) / 37 (octaves), climax 53/57, tag 60-61 (leap, turn and pocket land on I: the last full head), coda 64-65 (the leap alone, as in bar 1)
+  2 motifs: gamma in pre 13-15/29-30 and the first chorus answers 19/35 only (31 breaks out upward); beta in 18/34/54, bridge 42 (#11 in beta's slot) and 47 (in minor), climax apex 58, final A's 9-8 sigh 63; alpha's leap filled in by the verse HEAD (5, 9, 25, final A 63), as a m6 in bridge 45, a 5th in 46, a P5 in intro 3, inverted at verse 2's start (25), augmented in the build's tenor (49); the 3+3+2 pocket planted in verse 7, the build's top line 49-51 and augmented in bridge 48
+  3/4/5 loops, inner motion, bass line: see [texture] info above
+  6 cadences: half (16 V, dry stab + drop), elided authentic (24 -> 25, Eb5 tied over), deceptive (40 -> 41: the sus Eb5 held over becomes Cm's 3rd), C pedal = V of F (49-52), minor plagal Bbmaj9 -> Bbm6 -> Fadd9 (65-67, Db5 tied over the bar line -> C5)
+  7 arrivals: silence before chorus 1 0.97s, before the climax 1.25s; apex F6 once at 180.6s = 81.8% v114; loudest section = climax
+  8 melody on top: see [melody] prominence / NOT ON TOP / RUB above
+  9 breathing: see [melody] BREATH (every bar has a rest >= 1/2 beat or a note >= 1.5 beats)
+ 10 groove: swing 0.56-0.58 (choruses, verse 2, pre 2), 0.56 climax; ghosts 27-32 (50), LH ghosts as soft dyads (octave + 5th), RH ghost dyads on the swung odd 16th in 35, 39, 55, 59; the LH kick / ghost layer straight under the swung melody and ghosts (38 LH 16ths re-gridded; the RH hats sit on straight 8th off-beats); backbeat shells on 2 & 4 (choruses), on 3 (bridge); groove half pedal (CC64 60) over bars 17-24 and 29-40 (verse 2 full legato pedal); anticipations see [groove]
+ 11 tempo: see [groove] info (groove sections within 1 %)
+ 12 dynamics, melody max per section: intro 57, verse1 69, pre1 84, chorus1 92, verse2 74, pre2 90, chorus2 96, bridge 81, build 88, climax 114, tag 99, finalA 57, coda 54
+ 13 playability: see [playability] / [fingering] / [sketch.extra_checks]
+ 14 pedal: see [structure] PEDAL lines and [pedal-policy] (one change per harmony, dry lifts only at fills and drops, re-catches on re-struck basses 17/21/37/53/55/63, half-pedal flutters on turns, heads and the tear 5/10/17/21/25/33/57/59/61, groove half pedal 17-24 and 29-40) and [pedal-clusters]
+ 13b key releases (finger-aware since fix round 2: a key whose finger would cross or overstretch against a new key is let go first, with the jump air of the larger of the key's and the hand centre's travel: 50 ms <= 12 st, 100 ms 13-24 st, 140 ms beyond): 427 keys let go early for travel time, 15 pedal changes at the fast timing so the bass is still caught; see [key-air] / [finger-travel] / [finger-order] / [finger-pins]
+ 15 ending: Friberg rit w=0.6 q=2.5 over 65-66; Db5 (b6) tied over the bar line as a Bbm6/F appoggiatura, last melody C5 v42 on beat 2 over the rolled Fadd9; the chord rings 6.6s, then a 0.7 s damper ramp; b6-5 (Db5 -> C5), 4-3 (tenor Bb3 -> A3) and 9-3 (RH G4 -> A4) resolve together inside it
+ 16 duration to last note-off 220.8s = 3:40.8
+ 17 originality: RFIY 4-interval matches 0, neighbour oscillations 0; see [originality]; no vi-IV-I-V, no 8th-note arpeggio loops (every LH bar hand-written). Human A/B listening: NOT done
+ 18 sound: melody VEL-REPEAT checked in [melody]; releases / reverb / clipping belong to the render (music/render_audio.py)
+
+TOTAL ISSUES: 0

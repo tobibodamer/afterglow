@@ -1,0 +1,8 @@
+{
+ "_comment": "Default for music/render_audio.py. Solo-piano ballad: synthetic hall RT60 ~2.1 s at 1 kHz (T30 2.08 s), 24 ms pre-delay, wet -9 dB re dry (mid-band), mastered to -16 LUFS / -1.2 dBTP. Equals the sampler.Config defaults, spelled out so the choice is visible.",
+ "reverb": "synth",
+ "reverb_wet_db": -9.0,
+ "reverb_predelay_ms": 24.0,
+ "reverb_rt60": [2.6, 2.5, 2.35, 2.2, 2.1, 1.9, 1.6, 1.15, 0.7],
+ "target_lufs": -16.0
+}

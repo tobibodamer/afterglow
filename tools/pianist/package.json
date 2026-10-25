@@ -1,0 +1,1 @@
+{"name":"afterglow-pianist-tools","private":true,"type":"module","description":"Pianist asset pipeline helpers (GLB packing).","dependencies":{"@gltf-transform/core":"4.2.1","@gltf-transform/extensions":"4.2.1","@gltf-transform/functions":"4.2.1","meshoptimizer":"0.25.0"}}
