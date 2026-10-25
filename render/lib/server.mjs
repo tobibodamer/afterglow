@@ -29,6 +29,8 @@ export function startServer(port = 0, hooks = {}, { root = REPO_ROOT, host = '12
   return new Promise((resolve, reject) => {
     const srv = http.createServer((req, res) => {
       const url = new URL(req.url, 'http://x');
+      // extra routes (player/play.mjs): a hook that returns true has answered the request itself
+      if (hooks.onRequest && hooks.onRequest(req, res, url)) return;
       if (req.method === 'POST' && url.pathname === '/frame') {
         const chunks = [];
         req.on('data', (c) => chunks.push(c));

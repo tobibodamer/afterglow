@@ -301,6 +301,7 @@ export function createFilm() {
         width, height, quality: S.quality,          // aliases of settings.width/height/quality (constant per session)
         options: opts.moduleOptions || {},          // per-module options, e.g. { world: {...} } (AG.init({ moduleOptions }))
         modules: {}, frame: 0, t: 0, m: -MUSIC_OFFSET, shot: null, subframe: null,
+        cameraSource: camMod,                       // the imported camera module (shots.js, auto.js, ...) or null
         FPS, MUSIC_OFFSET, time: { frameToTime, timeToFrame, filmToMusic, musicToFilm },
         loadData,
         registerSkyBake: (fn) => { S.hooks.sky.push(fn); },

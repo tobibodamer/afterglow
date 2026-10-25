@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Afterglow Player</title>
+<style>
+  :root { --fg: #f3e9df; --dim: #b9a99c; --bar: rgba(12, 10, 14, 0.72); --accent: #ffb27a; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  #stage canvas { max-width: 100vw; max-height: 100vh; width: auto; height: auto; aspect-ratio: 16 / 9; }
+  button { font: inherit; color: var(--fg); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  button:hover { background: rgba(255, 255, 255, 0.16); }
+  #library { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 70%, #3a2230 0%, #0b0a10 70%); }
+  #library.hidden, #bar.hidden, #busy.hidden { display: none; }
+  .panel { width: min(520px, calc(100vw - 32px)); }
+  .panel h1 { font-weight: 500; font-size: 22px; margin: 0 0 16px; letter-spacing: 0.02em; }
+  #drop { border: 1px dashed rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 28px; text-align: center; }
+  #drop.over { border-color: var(--accent); background: rgba(255, 178, 122, 0.08); }
+  #songs { list-style: none; padding: 0; margin: 16px 0 0; max-height: 40vh; overflow: auto; }
+  #songs li { display: flex; gap: 12px; align-items: center; padding: 8px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; }
+  #songs li:hover { background: rgba(255, 255, 255, 0.05); }
+  #songs .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #songs .s { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .progress { height: 4px; background: rgba(255, 255, 255, 0.12); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.5s; }
+  #busy { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.55); }
+  #busy .line { color: var(--dim); margin-top: 8px; font-size: 12px; font-family: ui-monospace, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 10px 16px; background: var(--bar); transition: opacity 0.4s; }
+  #bar.idle { opacity: 0; }
+  #seek { flex: 1; position: relative; height: 18px; cursor: pointer; }
+  #seek .track { position: absolute; left: 0; right: 0; top: 8px; height: 3px; background: rgba(255, 255, 255, 0.2); }
+  #seek .fill { position: absolute; left: 0; top: 8px; height: 3px; background: var(--accent); }
+  #seek .sec { position: absolute; top: 5px; width: 1px; height: 9px; background: rgba(255, 255, 255, 0.45); }
+  #time, #shot { font-variant-numeric: tabular-nums; color: var(--dim); white-space: nowrap; }
+  #title { max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #play { min-width: 64px; }
+  @media (max-width: 640px) { #title, #shot { display: none; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+
+<div id="library">
+  <div class="panel">
+    <h1>Afterglow Player</h1>
+    <div id="drop">
+      <button id="open">Open MIDI file</button>
+      <input id="file" type="file" accept=".mid,.midi,.kar,.rmi,audio/midi" hidden>
+    </div>
+    <ul id="songs"></ul>
+  </div>
+</div>
+
+<div id="busy" class="hidden">
+  <div class="panel">
+    <div id="busyTitle"></div>
+    <div class="progress"><i id="busyBar"></i></div>
+    <div class="line" id="busyLine"></div>
+  </div>
+</div>
+
+<div id="bar" class="hidden">
+  <button id="play">Play</button>
+  <span id="title"></span>
+  <div id="seek"><div class="track"></div><div class="fill"></div></div>
+  <span id="time">0:00 / 0:00</span>
+  <span id="shot"></span>
+  <button id="lib">Library</button>
+</div>
+
+<script type="module" src="./player.js"></script>
+</body>
+</html>

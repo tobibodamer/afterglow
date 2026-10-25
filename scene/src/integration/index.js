@@ -9,7 +9,7 @@
 //                     them through ctx.rigGroup every frame, so the per-shot rig-yaw cheat moves them with the piano)
 //                     world lighting hooks (world.glowLight, world.envMap) present for the piano kicker / pianist rim
 //                   and records the result in info().wiring (AG.info().integration).
-//   beforeFrame() - per-shot module looks from the edit: a shot spec in scene/src/camera/shots.js may carry
+//   beforeFrame() - per-shot module looks from the edit: a shot spec in scene/src/camera/shots.js (or auto.js) may carry
 //                     piano: { lacquerLook: 'auto'|'wide'|'close'|'physical'|{...} }
 //                   (default: the session option moduleOptions.piano.lacquerLook, else 'auto'). Stateless: set every frame.
 //   probe()       - read-only inspection for the integration checks (sandbox/integration/sync.mjs): the key / hammer /
@@ -25,8 +25,9 @@ export async function create(ctx) {
   const world = M.world || null, piano = M.piano || null, pianist = M.pianist || null;
   let L = null;
   try { L = await import('../piano/layout.js'); } catch (e) { /* placeholder piano: no layout */ }
-  let cam = null;
-  try { cam = await import('../camera/shots.js'); } catch (e) { /* no edit */ }
+  // the edit the core renders (ctx.cameraSource: shots.js for the film, auto.js in the player), else the film's
+  let cam = ctx.cameraSource && ctx.cameraSource.director ? ctx.cameraSource : null;
+  if (!cam) try { cam = await import('../camera/shots.js'); } catch (e) { /* no edit */ }
   const opts = (ctx.options && ctx.options.integration) || {};
   const pianoOpts = (ctx.options && ctx.options.piano) || {};
   const pianistOpts = (ctx.options && ctx.options.pianist) || {};
