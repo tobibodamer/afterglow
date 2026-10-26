@@ -18,7 +18,7 @@
 import * as THREE from 'three';
 import { WORLD_DEFAULTS, mergeParams } from './params.js';
 import { SkySystem, ENV_LAYER } from './sky.js';
-import { makeHeightField, makeTerrain, buildTerrainGeometry } from './terrain.js';
+import { makeHeightField, makeTerrain, buildTerrainGeometry, chunkGeometry, chunkMesh } from './terrain.js';
 import { makeBoulders } from './boulders.js';
 import { makeWater, defaultRippleEvents, omegaOf, groupSpeed, MAX_EVENTS, MAX_EMITTERS } from './water.js';
 import { displayHexToScene, piecewise, halton } from './util.js';
@@ -96,7 +96,7 @@ export async function create(ctx) {
   group.add(sky.dome);
   const heightAt = makeHeightField(P.terrain);
   const terrain = makeTerrain(P, shared, heightAt);
-  group.add(terrain.mesh);
+  group.add(terrain.chunks);
   const boulders = makeBoulders(P, shared, heightAt);
   group.add(boulders.group);
   const { water, uniforms: WU } = makeWater(P, shared, { width: W_px, height: H_px, reflScale: P.bake.reflScale });
@@ -113,14 +113,18 @@ export async function create(ctx) {
   // boulders get mirror copies (scale.y = -1, ENV_LAYER only: never seen by the main or the reflection cameras), so
   // the env shows the dark mirrored ridges right below the horizon, as the real Reflector does
   const envMirror = new THREE.Group(); envMirror.name = 'AG.world.envMirror'; envMirror.scale.y = -1;
-  let envTm = null;
+  const envTerrain = new THREE.Group(); envTerrain.name = 'AG.world.envMirror.terrain'; envTerrain.layers.set(ENV_LAYER);
+  const mirrorChunks = () => {
+    envTerrain.clear();
+    terrain.chunks.children.forEach((c, i) => { const m = chunkMesh(c.geometry, c.material, 'AG.world.envMirror.terrain', i); m.layers.set(ENV_LAYER); envTerrain.add(m); });
+  };
+  mirrorChunks();
+  envMirror.add(envTerrain);
   {
-    const tm = new THREE.Mesh(terrain.mesh.geometry, terrain.mesh.material); envTm = tm;
-    tm.frustumCulled = false; tm.layers.set(ENV_LAYER); envMirror.add(tm);
     for (const m of boulders.group.children) {
       if (!m.isInstancedMesh) continue;
       const bm = new THREE.InstancedMesh(m.geometry, m.material, m.count);
-      bm.instanceMatrix = m.instanceMatrix; bm.frustumCulled = false; bm.layers.set(ENV_LAYER); envMirror.add(bm);
+      bm.instanceMatrix = m.instanceMatrix; bm.computeBoundingSphere(); bm.layers.set(ENV_LAYER); envMirror.add(bm);
     }
   }
   envMirror.layers.set(ENV_LAYER);
@@ -284,7 +288,12 @@ export async function create(ctx) {
       const T2 = JSON.parse(JSON.stringify(P.terrain));
       for (const [k, v] of Object.entries(over)) { const ks = k.split('.'); let o = T2; for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]]; o[ks.at(-1)] = v; }
       const b = buildTerrainGeometry({ ...P, terrain: T2 }, makeHeightField(T2));
-      const old = terrain.mesh.geometry; terrain.mesh.geometry = b.geometry; if (envTm) envTm.geometry = b.geometry; old.dispose();
+      const old = terrain.mesh.geometry; terrain.mesh.geometry = b.geometry;
+      for (const c of terrain.chunks.children) c.geometry.dispose();
+      terrain.chunks.clear();
+      chunkGeometry(b.geometry).forEach((g, i) => { const m = chunkMesh(g, terrain.mesh.material, 'AG.world.terrain', i); m.layers.enable(ENV_LAYER); terrain.chunks.add(m); });
+      mirrorChunks();
+      old.dispose();
       return { triangles: b.triangles, vertices: b.vertices };
     },
     get envMap() { return envRT ? envRT.texture : null; },
@@ -362,6 +371,7 @@ export async function create(ctx) {
     },
     dispose() {
       sky.dispose(); envCubeRT.dispose(); envRT?.dispose(); pmrem.dispose();
+      for (const c of terrain.chunks.children) c.geometry.dispose();
       terrain.mesh.geometry.dispose(); terrain.mesh.material.dispose();
       water.getRenderTarget().dispose(); water.material.dispose();
     },

@@ -99,24 +99,36 @@ export function makeBoulders(P, shared, height) {
       }`,
   });
   let tris = 0, count = 0;
+  // instances split into azimuth sectors (one InstancedMesh each, sharing the geometry), so every pass and cube face
+  // frustum-culls the sectors it cannot see
+  const SECTORS = 16;
+  const sectorOf = (b) => Math.min(SECTORS - 1, Math.floor((Math.atan2(b.z, b.x) / (2 * Math.PI) + 0.5) * SECTORS));
   const addInstances = (geos, picks) => {
-    picks.forEach((list, v) => {
-      if (!list.length) return;
-      const g = geos[v];
-      const mesh = new THREE.InstancedMesh(g, mat, list.length);
-      const varr = new Float32Array(list.length);
-      const m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
-      list.forEach((b, i) => {
-        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), b.ry);
-        sc.set(b.s * b.sx, b.s, b.s / b.sx); p.set(b.x, b.y, b.z);
-        m.compose(p, q, sc); mesh.setMatrixAt(i, m); varr[i] = b.var;
-      });
-      g.setAttribute('aVar', new THREE.InstancedBufferAttribute(varr, 1));
-      mesh.instanceMatrix.needsUpdate = true;
-      mesh.frustumCulled = false; mesh.layers.enable(ENV_LAYER);
-      group.add(mesh);
-      tris += (g.index ? g.index.count : g.attributes.position.count) / 3 * list.length; count += list.length;
+    picks.forEach((all, v) => {
+      const bySector = Array.from({ length: SECTORS }, () => []);
+      for (const b of all) bySector[sectorOf(b)].push(b);
+      for (const list of bySector) if (list.length) addMesh(geos[v], list);
     });
+  };
+  const addMesh = (g0, list) => {
+    // per-sector geometry: the variant's vertex buffers and index, plus this sector's own aVar
+    const g = new THREE.BufferGeometry();
+    for (const [k, v] of Object.entries(g0.attributes)) g.setAttribute(k, v);
+    g.setIndex(g0.index); g.boundingSphere = g0.boundingSphere ?? (g0.computeBoundingSphere(), g0.boundingSphere);
+    const mesh = new THREE.InstancedMesh(g, mat, list.length);
+    const varr = new Float32Array(list.length);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
+    list.forEach((b, i) => {
+      q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), b.ry);
+      sc.set(b.s * b.sx, b.s, b.s / b.sx); p.set(b.x, b.y, b.z);
+      m.compose(p, q, sc); mesh.setMatrixAt(i, m); varr[i] = b.var;
+    });
+    g.setAttribute('aVar', new THREE.InstancedBufferAttribute(varr, 1));
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    mesh.layers.enable(ENV_LAYER);
+    group.add(mesh);
+    tris += (g.index ? g.index.count : g.attributes.position.count) / 3 * list.length; count += list.length;
   };
   // waterline zones
   B.zones.forEach((Z, zi) => {
