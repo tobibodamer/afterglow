@@ -164,12 +164,12 @@ node render/serve.mjs     # then open http://127.0.0.1:8137/scene/index.html?pre
 | `await AG.renderStill(frame, opts)` | `renderFrame` plus readback. `{dataURL: true}` also returns a PNG data URL. |
 | `await AG.flush()` | Waits for the in-flight pipelined upload. Throws if the WebGL context was lost at any point in the session. |
 | `AG.dispose()` | Calls every module's `dispose()` (reverse creation order), then frees the core targets and the renderer. Returns `{disposed, errors}`. Render sessions end by closing the browser; the self test calls it. |
+| `AG.present({ smaa })` | Draws the last output frame to the canvas (interactive use only). `smaa: true` runs three's SMAA pass on it on the way (the real-time player's one-sub-frame frames, which have no other anti-aliasing); the output target is linear-filtered for SMAA's blend, which leaves readback unchanged. |
+| `AG.setCamera(o)`, `await AG.setLUT(src)`, `AG.setGrade(g)` | Session camera override, session LUT (`'film'`, `'identity'`/null, URL, .cube text, Float32 table; `AG.info().lut` names the one in use; the per-class wide LUT only rides on `'film'`), session grade. |
+| `await AG.regrade({ debugView, lut, grade, transfer, tag })` | Checks only: runs the final pass again on the LAST frame's accumulation with another look (e.g. `debugView: 'nolut'` = the ungraded frame the LUT fit uses) and outputs it like `renderFrame`. `session.regrade(opts)` in render/lib/session.mjs; `check.mjs --nolut` saves `<still>_nolut.png` this way. |
 
 `renderFrame`, `readPixels` and `flush` throw once the WebGL context has been lost (section 1, chunked render), so a
 driver can never read the previous frame's pixels as the current one.
-| `AG.present()` | Draws the last output frame to the canvas (interactive use only). |
-| `AG.setCamera(o)`, `await AG.setLUT(src)`, `AG.setGrade(g)` | Session camera override, session LUT (`'film'`, `'identity'`/null, URL, .cube text, Float32 table; `AG.info().lut` names the one in use; the per-class wide LUT only rides on `'film'`), session grade. |
-| `await AG.regrade({ debugView, lut, grade, transfer, tag })` | Checks only: runs the final pass again on the LAST frame's accumulation with another look (e.g. `debugView: 'nolut'` = the ungraded frame the LUT fit uses) and outputs it like `renderFrame`. `session.regrade(opts)` in render/lib/session.mjs; `check.mjs --nolut` saves `<still>_nolut.png` this way. |
 
 `init` options:
 - `width`, `height`, `quality` (`'preview'|'final'`).
@@ -208,8 +208,8 @@ The module slots are configured at the top of `scene/src/main.js` (`MODULE_SLOTS
 | `camera` | `scene/src/camera/index.js` | none (skipped when missing or under `'placeholders'`) | no group: pins the world's sun to the edit's arc, rig-yaw check, diagnostics |
 | `integration` | `scene/src/integration/index.js` | none (skipped likewise) | no group: rig wiring checks, per-shot module looks, `AG.probe` (docs/INTEGRATION.md) |
 
-The camera source is `scene/src/camera/shots.js` (section 5) when that file exists. Otherwise the camera comes from
-the override or the default.
+The camera source is the camera module (section 5): `scene/src/camera/shots.js` when that file exists, or the URL
+given as `cameraModule`. Otherwise the camera comes from the override or the default.
 
 Module policy (`AG.init({modules})`, CLI `--modules`):
 - `'auto'` is the default: the real module when its file exists, the placeholder otherwise.
@@ -303,6 +303,7 @@ Rules every module must follow (BRIEF and DESIGN section 3):
 | `frame`, `t`, `m`, `shot` | current output frame, film time, music time (`t - 4.0`), shot `{id, t0, t1, settings, raw}` |
 | `subframe` | the current sub (below) |
 | `modules` | `{ world, piano, pianist, ... }`: instances created so far (create order = slot order) |
+| `cameraSource` | the imported camera module (shots.js for the film, auto.js in the player) or `null`; the integration module checks the edit it exports (`director`, `SHOTS`) and falls back to importing shots.js |
 | `FPS`, `MUSIC_OFFSET`, `time` | 60, 4.0, `{frameToTime, timeToFrame, filmToMusic, musicToFilm}` |
 | `registerSkyBake(fn)` | `fn(info)` once per output frame, before sub-frames, with the frame-centre camera; bake sky and clouds into a cube or equirect here |
 | `registerEnvCapture(fn)` | `fn(info)` after the sky bakes and module bakes (e.g. a lacquer env cube at the piano, pianist hidden). Set `scene.environment` here |
@@ -331,7 +332,9 @@ Rules every module must follow (BRIEF and DESIGN section 3):
   (hashed) pairing. The frame-centre sub (`k = -1`) gives 0.5.
 
 Sub-frame sample tables (`core/rng.js`, `subframeTable(N)`): one fixed table per N, identical for every frame and
-session. Shutter times are the N stratum centres `(k + 0.5) / N` (centred on the frame, no lag against the audio).
+session. N = 1 is the centre of everything (no jitter, the lens centre, shutter time 0.5): no anti-aliasing, depth of
+field, motion blur or soft shadows, and hashed alpha shows its raw pattern; the real-time player plays at N = 1 for
+that reason and renders a paused frame again at its full N. Shutter times are the N stratum centres `(k + 0.5) / N` (centred on the frame, no lag against the audio).
 Jitter, aperture and each module-dim pair are 2-D CMJ point sets (the aperture mapped to the 9-blade polygon with the
 concentric map), each chosen from a fixed list of seeds for its own spread. Which point goes with which sub-frame is
 then chosen by a deterministic local search that minimises the cross-correlations, weighted by visibility (time x
@@ -388,7 +391,11 @@ Sources, highest priority first:
      { "id": "keys_closeup", "posRig": [-0.95, 0.9, -0.12], "targetRig": [0.18, 0.74, 0.06], "focalMm": 85, "fStop": 2.0,
        "N": 32, "preblur": 1.2, "nearestDist": 0.5 }
      ```
-2. **`scene/src/camera/shots.js`**, which exports any of:
+2. **The camera module**: `scene/src/camera/shots.js` (the film's edit), or the URL in `AG.init({ cameraModule })`.
+   The player uses `scene/src/camera/auto.js?score=<url>&handtrack=<url>`, an automatic edit for any score compiled
+   by the film's director (cuts on bar lines, shot framings taken from the film's shots, focus on the solved hands;
+   the file's header lists the rules), and passes the same URL as `modules.camera` so both get one instance.
+   A camera module exports any of:
    - `cameraAt(t, shotRaw) -> state`.
    - `shotAt(t) -> shot`.
    - `SHOTS = [{id, t0, t1, ref, rigYawCheatDeg, camera: [{t, pos|posRig, target|targetRig, focalMm|fovDeg, focusDist, fStop}], easing, N, dofPreblur|preblur, nearestDist, shutter, sunElevationDeg, grade}]`.

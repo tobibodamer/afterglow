@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Real-time player: open a MIDI file, let the pianist solve it, watch him play it.
 //   node player/play.mjs [song.mid] [--port 8137] [--no-open]      (npm run play -- song.mid)
-//   node player/play.mjs song.mid --prepare                          convert + solve only, no server
+//   node player/play.mjs song.mid --prepare                          convert, solve and render the sound only, no server
 //
 // Per MIDI file (keyed by name + content hash) everything lands in build/player/<id>/:
 //   source.mid, score.json (player/midi.js), anim/perf.json + perf.bin (perf/solve.mjs), handtrack.json (the camera's

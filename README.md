@@ -235,29 +235,44 @@ the CC0 MakeHuman asset packs (`skins02`, `hands01`): set `AG_BLENDER` and `AG_M
 
 ```powershell
 npm run play -- path\to\song.mid      # or plain `npm run play`, then open or drop a file in the page
+node player/play.mjs song.mid --prepare                 # convert, solve and render the sound only, no server
+node player/play.mjs --port 8139 --no-open              # another port (default 8137, as render/serve.mjs), no browser
 ```
 
-The player converts the file to a score (`player/midi.js`: tempo and meter map, CC64 sustain pedal, the hands split by
-a Viterbi search, every note fingered by the solver), solves the performance with `perf/solve.mjs` and, beside it,
-renders the sound with the film's sampler (`music/render_audio.py`, preset `final`, from the same score; one of each
-at a time, resumed after a restart), then plays it in real time in the film's scene, with an automatic edit cut on the
-bars (`scene/src/camera/auto.js`, built from the film's own shots). The render needs the
-Salamander samples and the Python packages of the Soundtrack step above (the player uses `.venv` when there is one, or
-`AG_PYTHON`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
-samples were there get their render in the background. Solved songs are kept in `build/player/` and start at once.
-While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges; a paused frame is rendered again in full
-(N 4 in preview, the shot's own N in final quality). The settings menu (kept per browser) switches the quality (final
-also uses the film's full-size bakes), the render size (the screen's by default, at most 1920 x 1080), the sub-frames
-while playing (1, 2 or 4), SMAA, the full paused frame and a stats overlay (frame rate, N, size, shot and bar); quality
-and size reload the page at the same moment. Space plays and pauses, the arrow keys skip 5 s, F or a double-click is
-fullscreen, S shows the stats.
+What happens to a file:
+- **Score**: `player/midi.js` reads the tempo and meter map and the CC64 sustain pedal, and splits the hands by a
+  Viterbi search; the solver fingers every note.
+- **Performance**: `perf/solve.mjs`, then the camera's hand track (`sandbox/camera/handtrack.mjs`).
+- **Sound**: beside the solve, the film's sampler renders the score (`music/render_audio.py`, preset `final`). It needs
+  the Salamander samples and the Python packages of the Soundtrack step above (`AG_PYTHON`, else `.venv`, else
+  `python`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
+  samples were there get their render in the background.
+- **Camera**: an automatic edit for the score (`scene/src/camera/auto.js`): cuts on bar lines, framings taken from the
+  film's shots.
 
-The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
-piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives their
-tops to the free hand). The solve takes 8.3 min for 1,100 notes (3:48) and 11.5 min for Clair de lune (1,490 notes,
-4:09), the audio render 74 s and 93 s. At 1920 x 1080 on an RTX 5070 the player draws about 36 fps in preview and 42
-in final quality (the bakes are per shot, so the two vary with the shot), and a paused frame takes 50 ms (N 4) or
-0.3 s (N 32).
+One solve and one sound render run at a time, resumed after a restart. Everything lands in `build/player/<id>/`, so a
+song solved once starts at once.
+
+Playing:
+- While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges. A paused frame is rendered again with
+  its full N (4 in preview, the shot's own N in final quality), so it shows the film's depth of field, motion blur,
+  soft shadows and anti-aliasing, which a single sub-frame cannot have (docs/RENDERING.md, section 3).
+- The settings menu (gear icon, kept per browser): quality (final also uses the film's full-size reflection, sky and
+  lighting bakes), resolution (the screen's by default, at most 1920 x 1080), sub-frames while playing (1, 2 or 4),
+  SMAA, the full paused frame, and a stats overlay (frame rate, N, size, shot and bar). Quality and resolution reload
+  the page at the same moment.
+- Keys: space plays and pauses, the arrow keys skip 5 s, Home goes to the start, F or a double-click is fullscreen,
+  S shows the stats.
+- URL overrides: `?w=&h=` render size, `?quality=preview|final`, `?t=` start time (film seconds).
+
+Measured:
+- The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
+  piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives
+  their tops to the free hand).
+- The solve takes 8.3 min for 1,100 notes (3:48) and 11.5 min for Clair de lune (1,490 notes, 4:09); the sound render
+  74 s and 93 s.
+- At 1920 x 1080 on an RTX 5070: 56 fps playing at N = 1, 48 at N = 2 (preview, Clair de lune). A paused frame takes
+  50-100 ms at N 4 and about 0.4 s at N 32 in final.
 
 ## Repository layout
 
@@ -272,7 +287,8 @@ scene/                 the film as a web page (ES modules, import map, no bundle
   src/integration/     wiring checks, per-shot looks, motion-blur N boost table, sync probe
   src/perf/            performance track reader
 render/                Node drivers: still, chunked film render, encode + verify, snapshot, determinism, GPU lock
-player/                real-time MIDI player: MIDI to score, solve queue and server, player page, Web Audio piano
+player/                real-time MIDI player: MIDI to score, solve and sound-render queue, server, player page,
+                       Web Audio piano fallback
 perf/                  performance solver (timing, fingering, keyframes, IK, body, feet, keys, ripples) and QC
 music/                 score DSL, the composition, sampler, mix; final/ = score.json, score.mid, lead sheet, rolls
   presets/, ir/        mix presets; an optional measured-hall impulse response (Git LFS, not used in the mix)
