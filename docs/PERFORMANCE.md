@@ -756,6 +756,28 @@ contactStraight 0 -> 38, freeClaw 38 -> 134, freeLifted 67 -> 252, freeStraight 
 real (on-key thumb > 35 mm out R 54.8 -> 41.3 %, knuckles p50 59.2 -> 53.3 mm) but it brings new straight thumbs and
 straight contact fingers, so it is not better on the census.
 
+### Motion round (2026-10-26: palm trajectory, `trajectory.js`)
+
+Critique: the hands sat still on each position, then crossed at the last moment in ~0.12-0.16 s with no ease (robotic).
+Changes: section 3.5 (unhurried just-in-time transfers, minimum-jerk path within the fingers' slack) and the free thumb
+(`hand.js solveThumb(..., free)`: active-set LM step at a joint limit; 9 mm clearance sphere in `fingers.js`).
+Whole piece vs the code before the round (`--qc-rate 15`, `perf/qc/motion_stats.mjs` on the written tracks, R / L):
+
+| measure | before | after |
+|---|---|---|
+| hand still (< 5 mm/s) share of playing time | 0.54 / 0.59 | 0.24 / 0.16 |
+| transfer duration p50 (s) | 0.125 / 0.167 | 0.233 / 0.313 |
+| transfer peak speed p50 / p95 (m/s) | 0.56 / 2.03; 1.75 / 3.54 | 0.46 / 1.88; 1.43 / 3.19 |
+| wrist jerk RMS / p99 (m/s^3) | 403 / 2026; 588 / 2741 | 336 / 1642; 398 / 1922 |
+| QC contact p99 / max (mm); hold max; notes off key | 0.511 / 2.66; 1.82; 2 | 0.507 / 3.96 (id552 L1 F4); 0.97; 1 |
+| QC own-key / free / neighbour flesh > 1 mm (vertex-frames) | 832 / 2894 / 27824 | 241 / 2307 / 28968 |
+| QC neighbour max (m 103.8 R thumb base in the key slip, G#4 held) | 13.2 | 17.0 |
+| QC finger pops > 3 (> 8) deg @240 Hz | 1162 (117) | 1031 (104) |
+
+The score bounds the stride leaps: the bass key may rise only once the pedal has caught, so those leaps keep ~150 ms.
+Streaming: `smoothPalmPath` is a banded solve, so a live solver can run it as a fixed-lag smoother over a sliding
+window (lookahead of a few hundred ms); the keyframe solve and the skinned-mesh clearance passes are the costly parts.
+
 ### Open items (next rounds)
 - (after cycle 2 fix round 2) Bar 22 id322 (above); octave passages keep the thumb ~50-60 mm out (the span allowance:
   natural for octaves, still counted by the critic's pointer census, S22/S21/S20c); starfish spread and ring-little
