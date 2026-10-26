@@ -427,7 +427,9 @@ export async function solve(opts) {
         // free fingers resting in the hover keep their abduction within +-12 deg (no sideways splay); in transfers and within
         // 0.1 s of a key they may use the full range (a cap there would make them miss their path and jump)
         const abdCap = tg.mode === 'free' && !(tg.dbg && tg.dbg.transfer) && Math.min(t - (tg.prev ? upT(tg.prev) : -1e9), (tg.next ? touchT(tg.next) : 1e9) - t) > 0.1 ? 12 * DEG : null;
-        const solveF = (p, a0) => (f === 1 ? H.solveThumb(palm, p, a0, tpref, tg.mode === 'free') : H.solveFinger(f, palm, p, a0, tg.dipRatio, null, pipB, abdCap));
+        // a contact thumb that stalls > 1 mm short (a joint pinned at its floor) retries with the free thumb's active set
+        const solveThumbC = (p, a0) => { const r1 = H.solveThumb(palm, p, a0, tpref); if (r1.err < 0.001) return r1; const r2 = H.solveThumb(palm, p, a0, tpref, true); return r2.err < 0.7 * r1.err ? r2 : r1; };
+        const solveF = (p, a0) => (f === 1 ? (tg.mode === 'free' ? H.solveThumb(palm, p, a0, tpref, true) : solveThumbC(p, a0)) : H.solveFinger(f, palm, p, a0, tg.dipRatio, null, pipB, abdCap));
         r = solveF(tg.p, warm[s][f]);
         // cycle 2 (critic S14: a free finger hinged at the knuckle with the PIP open, 'pointing'; range r7a: the 22 mm drape
         // of a rolled LH made L4/L5 MCP 60 / PIP at its 18 deg floor): where the free target can only be reached hinged
@@ -787,6 +789,10 @@ function contactPreservingPalm(H, notes, sm, { t0, dt, range, keyAngle, thumbPre
     d = d.map((x) => x * decay);
     if (byF.size) {
       const cs = [...byF.values()]; const tg = cs.map((n) => target(n, t));
+      // legato hand-over: while another finger is still in its stroke, a finger riding its released key up keeps little
+      // pull on the palm (it lifts off the key instead), so the palm does not rise and leave the landing finger short
+      const landing = Math.max(...cs.map((n) => 1 - smoothstep(n.tm.tKb, n.tm.tKb + 0.05, t)));
+      const wc = cs.map((n) => 1 - 0.85 * landing * smoothstep(n.tm.tRel0, n.tm.tRel0 + 0.03, t));
       const base = { q: sm.q[i], p: sm.p[i] };
       const poseOf = (x) => ({ p: [base.p[0] + x[0], base.p[1] + x[1], base.p[2] + x[2]], q: qMul(qExp([x[3], x[4], x[5]]), base.q) });
       // fix round 1: the contact fingers' flesh in the NEIGHBOURING keys (skinned collision set, own key beyond 0.3 mm)
@@ -797,8 +803,8 @@ function contactPreservingPalm(H, notes, sm, { t0, dt, range, keyAngle, thumbPre
         const palm = poseOf(x); const r = []; penMax = 0;
         cs.forEach((n, k) => {
           const sol = n.f === 1 ? H.solveThumb(palm, tg[k], warm[n.f], thumbPrefAt(n.id, t)) : H.solveFinger(n.f, palm, tg[k], warm[n.f], dipRatioFor(n), null, contactPip(n.f));
-          warm[n.f] = sol.a; const fk = H.fingerFK(n.f, palm, sol.a); const c = H.padCenter(n.f, fk); r.push(c[0] - tg[k][0], c[1] - tg[k][1], c[2] - tg[k][2]);
-          if (ka) { const pen = fingerPenetration(H, n.f, palm, fk, ka, n.key, 0.0003); r.push(Math.sqrt(pen.sum) * 0.3); penMax = Math.max(penMax, pen.max); }
+          warm[n.f] = sol.a; const fk = H.fingerFK(n.f, palm, sol.a); const c = H.padCenter(n.f, fk); const w = wc[k]; r.push(w * (c[0] - tg[k][0]), w * (c[1] - tg[k][1]), w * (c[2] - tg[k][2]));
+          if (ka) { const pen = fingerPenetration(H, n.f, palm, fk, ka, n.key, 0.0003); r.push(Math.sqrt(pen.sum) * 0.3 * w); penMax = Math.max(penMax, w * pen.max); }
         });
         // critic round 3 (S15 octave Bb4-Bb5: the nudge traded reach for palm depth, thenar / heel 11 mm inside C5-F5): the
         // palm's own flesh in the keys (1 mm margin) is part of the residual, so the nudge never buys reach with palm depth
