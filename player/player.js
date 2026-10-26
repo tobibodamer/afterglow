@@ -1,9 +1,10 @@
 // The real-time player page (served by player/play.mjs). Two states:
 //   library   no ?song: open / drop a MIDI file (uploaded to the server, which converts and solves it) or pick one
-//   playback  ?song=<id>: the film's page core (scene/src/main.js) at N = 1 + SMAA, preview bakes, driven by the audio
-//             clock; camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
-// One AG session per page (AG.init runs once), so changing song reloads the page.
-//   ?w=&h= render size (default: the screen's pixels, at most 1920x1080)   ?quality=preview|final
+//   playback  ?song=<id>: the film's page core (scene/src/main.js), driven by the audio clock; N = 1 + SMAA while
+//             playing, the full frame (preview N 4 / the shot's own N in final) once paused;
+//             camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
+// One AG session per page (AG.init runs once), so changing song or quality reloads the page (at ?t=, paused).
+//   ?w=&h= render size (default: the screen's pixels, at most 1920x1080)   ?quality=preview|final   ?t=<film s>
 //   keys: space play/pause, arrows +-5 s, home, f fullscreen
 import { createFilm } from '/scene/src/main.js';
 import { PianoSynth, ScorePlayer } from './synth.js';
@@ -90,10 +91,11 @@ async function playback(id) {
 
   const AG = createFilm();
   window.AG = AG;
+  const quality = q.get('quality') === 'final' ? 'final' : 'preview';
   const px = Math.min(1920, screen.width * devicePixelRatio, (screen.height * devicePixelRatio * 16) / 9);
   const W = +(q.get('w') || 2 * Math.round(px / 2)), H = +(q.get('h') || 2 * Math.round((W * 9) / 32));
   await AG.init({
-    width: W, height: H, quality: q.get('quality') || 'preview', N: 1, motionBoost: false, warmup: false,
+    width: W, height: H, quality, motionBoost: false, warmup: false,
     cameraModule: camUrl, modules: { camera: camUrl },
     data: { score: `${dir}/score.json`, perfMeta: `${dir}/anim/perf.json`, perf: `${dir}/anim/perf.bin` },
   });
@@ -117,7 +119,7 @@ async function playback(id) {
   // clock: film time from the audio clock while playing (minus the output latency, so picture meets sound)
   const synth = wav ? null : new PianoSynth(audio);
   const sched = wav ? new WavPlayer(audio, wav) : new ScorePlayer(synth, score);
-  let base = 0, playing = false, pos = 0, timer = 0;
+  let base = 0, playing = false, pos = Math.min(END, Math.max(0, +(q.get('t') || 0))), timer = 0;
   const now = () => (playing ? audio.currentTime - (audio.outputLatency || audio.baseLatency || 0) - base : pos);
   window.__AG_PLAYER = { audio, synth, sched, now, source: wav ? 'wav' : 'synth' };   // debugging only
   function start() {
@@ -137,8 +139,9 @@ async function playback(id) {
   const toggle = () => (playing ? stop() : start());
   const seekTo = (t) => { const was = playing; stop(); pos = Math.min(END, Math.max(0, t)); dirty = true; if (was) start(); };
 
-  // render loop: the newest frame of the clock, never queued (a slow frame drops the ones it overran)
-  let rendering = false, lastFrame = -1, dirty = true;
+  // render loop: the newest frame of the clock, never queued (a slow frame drops the ones it overran); a frame that
+  // stays still for a moment is rendered again in full
+  let rendering = false, lastFrame = -1, dirty = true, full = false, stillSince = 0;
   async function frameLoop() {
     requestAnimationFrame(frameLoop);
     let t = now();
@@ -149,10 +152,13 @@ async function playback(id) {
     const f = Math.floor(shown * 60);
     $('seek').querySelector('.fill').style.width = `${(100 * t) / END}%`;
     $('time').textContent = `${fmt(t)} / ${fmt(END)}`;
-    if (rendering || (f === lastFrame && !dirty)) return;
+    if (rendering) return;
+    if (f !== lastFrame || dirty) { full = false; stillSince = performance.now(); }
+    else if (playing || full || performance.now() - stillSince < 250) return;
+    else full = true;
     rendering = true; dirty = false; lastFrame = f;
     try {
-      const r = await AG.renderFrame(f, { N: 1, transfer: 'none', sync: false });
+      const r = await AG.renderFrame(f, { N: full ? undefined : 1, transfer: 'none', sync: false });
       AG.present({ smaa: true });
       const d = window.__AG_CAMERA?.diag?.last;
       $('shot').textContent = d ? `${r.shot} · bar ${d.bar}` : r.shot;
@@ -162,6 +168,13 @@ async function playback(id) {
   $('busy').classList.add('hidden');
   $('bar').classList.remove('hidden');
   $('play').onclick = toggle;
+  $('final').classList.toggle('on', quality === 'final');
+  $('final').onclick = () => {
+    const p = new URLSearchParams(location.search);
+    if (quality === 'final') p.delete('quality'); else p.set('quality', 'final');
+    p.set('t', now().toFixed(2));
+    location.search = p;
+  };
   seek.onclick = (e) => { const r = seek.getBoundingClientRect(); seekTo(((e.clientX - r.left) / r.width) * END); };
   addEventListener('keydown', (e) => {
     if (e.code === 'Space') { e.preventDefault(); toggle(); }

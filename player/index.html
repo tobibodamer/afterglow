@@ -35,6 +35,7 @@
   #time, #shot { font-variant-numeric: tabular-nums; color: var(--dim); white-space: nowrap; }
   #title { max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #play { min-width: 64px; }
+  #final.on { color: #1a1210; background: var(--accent); border-color: var(--accent); }
   @media (max-width: 640px) { #title, #shot { display: none; } }
 </style>
 <script type="importmap">
@@ -72,6 +73,7 @@
   <div id="seek"><div class="track"></div><div class="fill"></div></div>
   <span id="time">0:00 / 0:00</span>
   <span id="shot"></span>
+  <button id="final">Final quality</button>
   <button id="lib">Library</button>
 </div>
 

@@ -240,18 +240,22 @@ npm run play -- path\to\song.mid      # or plain `npm run play`, then open or dr
 The player converts the file to a score (`player/midi.js`: tempo and meter map, CC64 sustain pedal, the hands split by
 a Viterbi search, every note fingered by the solver), solves the performance with `perf/solve.mjs` and, beside it,
 renders the sound with the film's sampler (`music/render_audio.py`, preset `final`, from the same score; one of each
-at a time, resumed after a restart), then plays it in real time in the film's scene at N = 1 with preview bakes and an
-automatic edit cut on the bars (`scene/src/camera/auto.js`, built from the film's own shots). The render needs the
+at a time, resumed after a restart), then plays it in real time in the film's scene, with an automatic edit cut on the
+bars (`scene/src/camera/auto.js`, built from the film's own shots). The render needs the
 Salamander samples and the Python packages of the Soundtrack step above (the player uses `.venv` when there is one, or
 `AG_PYTHON`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
 samples were there get their render in the background. Solved songs are kept in `build/player/` and start at once.
-The render size is the screen's, at most 1920 x 1080 (`?w=&h=` sets it). Space plays and pauses, the arrow keys
-skip 5 s, F is fullscreen.
+While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges; a paused frame is rendered again in full
+(N 4 in preview, the shot's own N with **Final quality**, which also switches to the film's full-size bakes and reloads
+the page at the same moment). The render size is the screen's, at most 1920 x 1080 (`?w=&h=` sets it). Space plays and
+pauses, the arrow keys skip 5 s, F is fullscreen.
 
 The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
 piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives their
 tops to the free hand). The solve takes 8.3 min for 1,100 notes (3:48) and 11.5 min for Clair de lune (1,490 notes,
-4:09), the audio render 74 s and 93 s; at 1280 x 720 the player draws 35-60 fps on an RTX 5070.
+4:09), the audio render 74 s and 93 s. At 1920 x 1080 on an RTX 5070 the player draws about 36 fps in preview and 42
+in final quality (the bakes are per shot, so the two vary with the shot), and a paused frame takes 50 ms (N 4) or
+0.3 s (N 32).
 
 ## Repository layout
 
