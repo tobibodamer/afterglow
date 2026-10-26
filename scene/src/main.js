@@ -35,6 +35,7 @@ import { CubeProbe, withAutoClear } from './core/envprobe.js';
 import { createRenderer, gpuInfo, syncGPU, watchContext } from './core/gpu.js';
 import { loadLut, lutTexture, parseCube, fromFloat32 } from './core/lut.js';
 import { GpuProfiler } from './core/profiler.js';
+import { SkinnedBounds, boundInstanced, splitSkinned } from './core/cull.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // MODULE CONFIG. Slots load in this order. 'auto' (the default policy) uses the real module when its file exists and
@@ -116,7 +117,7 @@ function normalizeBakes(b) {
 }
 
 export function createFilm() {
-  const S = { initDone: false, modules: [], hooks: { sky: [], env: [], pre: [] }, bakes: [], lastShotKey: null, last: null, lutCache: new Map() };
+  const S = { initDone: false, modules: [], hooks: { sky: [], env: [], pre: [], cull: [] }, bakes: [], lastShotKey: null, last: null, lutCache: new Map() };
 
   async function resolveModules(policy = 'auto') {
     const list = [];
@@ -249,6 +250,10 @@ export function createFilm() {
       const rigGroup = new THREE.Group(); rigGroup.name = 'rigGroup';
       rigGroup.rotation.y = BASE_RIG_YAW_DEG * D2R;
       scene.add(worldGroup, rigGroup); scene.updateMatrixWorld(true);
+      // bounds of GPU-animated meshes (core/cull.js): refreshed once per sub-frame, after three updates the world
+      // matrices and before it culls, in whichever pass renders the scene first
+      let cullKey = null;
+      scene.onBeforeRender = () => { if (cullKey !== S.ctx?.subframe) { cullKey = S.ctx?.subframe; for (const fn of S.hooks.cull) fn(); } };
       const camera = new THREE.PerspectiveCamera(40, width / height, DEFAULT_CAMERA.near, DEFAULT_CAMERA.far);
       camera.filmGauge = 36; camera.name = 'AG.camera';
       scene.add(camera);
@@ -309,8 +314,9 @@ export function createFilm() {
         registerSkyBake: (fn) => { S.hooks.sky.push(fn); },
         registerEnvCapture: (fn) => { S.hooks.env.push(fn); },
         registerPreSubframe: (fn) => { S.hooks.pre.push(fn); },
+        registerBeforeCull: (fn) => { S.hooks.cull.push(fn); },
         registerGradePreset: (name, params) => { GRADE_PRESETS[name] = params; },
-        core: { CubeProbe, withAutoClear, lens: LENS, rng: RNG, glsl: GLSL, sun: { dirFromAzEl, sunElevationAt }, accum: S.accum, final: S.final },
+        core: { CubeProbe, withAutoClear, SkinnedBounds, boundInstanced, splitSkinned, lens: LENS, rng: RNG, glsl: GLSL, sun: { dirFromAzEl, sunElevationAt }, accum: S.accum, final: S.final },
       };
       S.ctx = ctx;
       window.__AG_CTX = ctx; // debugging only

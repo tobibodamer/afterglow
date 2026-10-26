@@ -680,6 +680,9 @@ export async function create(ctx = {}) {
     },
     dispose() { group.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); Object.values(M).forEach((m) => m && m.dispose && m.dispose()); if (probe) probe.dispose(); },
   };
+  // instanced parts (keys, action, strings, pins, bench buttons): culled against their build-pose bound grown by
+  // 0.15 m, more than any key dip, hammer swing or damper lift (core/cull.js)
+  if (ctx.core?.boundInstanced) group.traverse((o) => { if (o.isInstancedMesh && !o.frustumCulled) ctx.core.boundInstanced(o, 0.15); });
   if (opts.debugGlobal) globalThis.__agPiano = api;   // look-dev drivers only (sandbox/piano2/shots.mjs)
   return api;
 }
