@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Afterglow Player</title>
+<style>
+  :root { --fg: #f3e9df; --dim: #b9a99c; --bar: rgba(12, 10, 14, 0.72); --accent: #ffb27a; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  #stage canvas { width: min(100vw, 100vh * 16 / 9); height: auto; aspect-ratio: 16 / 9; }
+  button { font: inherit; color: var(--fg); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  button:hover { background: rgba(255, 255, 255, 0.16); }
+  #library { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 70%, #3a2230 0%, #0b0a10 70%); }
+  #library.hidden, #bar.hidden, #busy.hidden, #menu.hidden, #stats.hidden { display: none; }
+  .panel { width: min(520px, calc(100vw - 32px)); }
+  .panel h1 { font-weight: 500; font-size: 22px; margin: 0 0 16px; letter-spacing: 0.02em; }
+  #drop { border: 1px dashed rgba(255, 255, 255, 0.3); border-radius: 10px; padding: 28px; text-align: center; }
+  #drop.over { border-color: var(--accent); background: rgba(255, 178, 122, 0.08); }
+  #songs { list-style: none; padding: 0; margin: 16px 0 0; max-height: 40vh; overflow: auto; }
+  #songs li { display: flex; gap: 12px; align-items: center; padding: 8px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; }
+  #songs li:hover { background: rgba(255, 255, 255, 0.05); }
+  #songs .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #songs .s { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .progress { height: 4px; background: rgba(255, 255, 255, 0.12); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.5s; }
+  #busy { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.55); }
+  #busy .line { color: var(--dim); margin-top: 8px; font-size: 12px; font-family: ui-monospace, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 6px; align-items: center; padding: 8px 12px; background: linear-gradient(transparent, rgba(8, 6, 10, 0.85)); transition: opacity 0.4s; }
+  #bar.idle { opacity: 0; cursor: none; }
+  #bar .icon { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; background: none; border: 0; border-radius: 50%; }
+  #bar .icon:hover, #bar .icon.on { background: rgba(255, 255, 255, 0.12); }
+  #bar .icon svg { width: 22px; height: 22px; fill: currentColor; fill-rule: evenodd; }
+  #seek { flex: 1; position: relative; height: 18px; margin: 0 8px; cursor: pointer; }
+  #seek .track { position: absolute; left: 0; right: 0; top: 8px; height: 3px; background: rgba(255, 255, 255, 0.2); }
+  #seek .fill { position: absolute; left: 0; top: 8px; height: 3px; background: var(--accent); }
+  #seek .sec { position: absolute; top: 5px; width: 1px; height: 9px; background: rgba(255, 255, 255, 0.45); }
+  #time { font-variant-numeric: tabular-nums; color: var(--dim); white-space: nowrap; }
+  #title { max-width: 28vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 4px; }
+  #menu { position: fixed; right: 12px; bottom: 60px; width: max-content; max-width: calc(100vw - 24px); padding: 6px 0; background: rgba(20, 16, 22, 0.94); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; }
+  #menu .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 14px; }
+  #menu .seg { display: flex; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px; overflow: hidden; }
+  #menu .seg button { border: 0; border-radius: 0; padding: 3px 9px; background: none; font-size: 13px; }
+  #menu .seg button + button { border-left: 1px solid rgba(255, 255, 255, 0.18); }
+  #menu .seg button.on { color: #1a1210; background: var(--accent); }
+  #stats { position: fixed; top: 10px; left: 12px; padding: 6px 9px; border-radius: 6px; background: rgba(0, 0, 0, 0.55); color: var(--fg); font: 12px/1.5 ui-monospace, monospace; white-space: pre; pointer-events: none; }
+  @media (max-width: 640px) { #title { display: none; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+
+<div id="library">
+  <div class="panel">
+    <h1>Afterglow Player</h1>
+    <div id="drop">
+      <button id="open">Open MIDI file</button>
+      <input id="file" type="file" accept=".mid,.midi,.kar,.rmi,audio/midi" hidden>
+    </div>
+    <ul id="songs"></ul>
+  </div>
+</div>
+
+<div id="busy" class="hidden">
+  <div class="panel">
+    <div id="busyTitle"></div>
+    <div class="progress"><i id="busyBar"></i></div>
+    <div class="line" id="busyLine"></div>
+  </div>
+</div>
+
+<div id="bar" class="hidden">
+  <button id="play" class="icon" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></button>
+  <span id="title"></span>
+  <div id="seek"><div class="track"></div><div class="fill"></div></div>
+  <span id="time">0:00 / 0:00</span>
+  <button id="set" class="icon" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.3 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
+  <button id="fs" class="icon" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button>
+  <button id="lib" class="icon" aria-label="Library"><svg viewBox="0 0 24 24"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg></button>
+</div>
+
+<div id="menu" class="hidden"></div>
+<div id="stats" class="hidden"></div>
+
+<script type="module" src="./player.js"></script>
+</body>
+</html>

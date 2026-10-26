@@ -15,6 +15,7 @@
 // Every random number is an integer hash of the pixel and the frame index: bit-identical in every session.
 import * as THREE from 'three';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { FULLSCREEN_VERT, GLSL_PCG, GLSL_PBR_NEUTRAL, GLSL_SRGB } from './glsl.js';
 import { VeilingGlare } from './glare.js';
 import { identityTable, lutTexture } from './lut.js';
@@ -110,7 +111,7 @@ export class FinalPass {
   constructor(renderer, width, height) {
     this.renderer = renderer; this.width = width; this.height = height;
     this.outRT = new THREE.WebGLRenderTarget(width, height, { type: THREE.UnsignedByteType, format: THREE.RGBAFormat, depthBuffer: false,
-      minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, generateMipmaps: false });
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false });   // linear for SMAA's blend
     this.outRT.texture.name = 'AG.outRT';
     this.glare = new VeilingGlare(renderer, width, height);
     this.identityLut = lutTexture(identityTable(33));
@@ -165,8 +166,19 @@ export class FinalPass {
       glareMix: +glareMix.toFixed(6), glareCore: glareTex ? +this.glare.coreEnergy.toFixed(4) : null, lut: lut.userData.title };
   }
 
-  /** draw the last output frame to the canvas (interactive preview only) */
-  present() {
+  /** draw the last output frame to the canvas (interactive preview only); smaa: edge anti-aliasing on the way */
+  present({ smaa = false } = {}) {
+    let tex = this.outRT.texture;
+    if (smaa) {
+      if (!this.smaa) {
+        this.smaa = new SMAAPass();
+        this.smaa.setSize(this.width, this.height);
+        this.aaRT = new THREE.WebGLRenderTarget(this.width, this.height, { depthBuffer: false });
+      }
+      this.smaa.render(this.renderer, this.aaRT, this.outRT);
+      tex = this.aaRT.texture;
+    }
+    this.presentQuad.material.uniforms.tOut.value = tex;
     this.renderer.setRenderTarget(null);
     this.renderer.setViewport(0, 0, this.width, this.height);
     this.presentQuad.render(this.renderer);
@@ -175,6 +187,7 @@ export class FinalPass {
   dispose() {
     this.outRT.dispose(); this.glare.dispose(); this.identityLut.dispose();
     this.quad.material.dispose(); this.quad.dispose(); this.presentQuad.material.dispose(); this.presentQuad.dispose();
+    if (this.smaa) { this.smaa.dispose(); this.aaRT.dispose(); }
   }
 }
 

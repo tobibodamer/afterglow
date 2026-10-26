@@ -231,6 +231,49 @@ The pianist asset is committed (`assets/pianist/pianist.glb`). Rebuilding it nee
 the CC0 MakeHuman asset packs (`skins02`, `hands01`): set `AG_BLENDER` and `AG_MPFB_DATA`, then
 `pwsh -File tools/pianist/run_all.ps1` (assets/pianist/README.md).
 
+## Play a MIDI file
+
+```powershell
+npm run play -- path\to\song.mid      # or plain `npm run play`, then open or drop a file in the page
+node player/play.mjs song.mid --prepare                 # convert, solve and render the sound only, no server
+node player/play.mjs --port 8139 --no-open              # another port (default 8137, as render/serve.mjs), no browser
+```
+
+What happens to a file:
+- **Score**: `player/midi.js` reads the tempo and meter map and the CC64 sustain pedal, and splits the hands by a
+  Viterbi search; the solver fingers every note.
+- **Performance**: `perf/solve.mjs`, then the camera's hand track (`sandbox/camera/handtrack.mjs`).
+- **Sound**: beside the solve, the film's sampler renders the score (`music/render_audio.py`, preset `final`). It needs
+  the Salamander samples and the Python packages of the Soundtrack step above (`AG_PYTHON`, else `.venv`, else
+  `python`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
+  samples were there get their render in the background.
+- **Camera**: an automatic edit for the score (`scene/src/camera/auto.js`): cuts on bar lines, framings taken from the
+  film's shots.
+
+One solve and one sound render run at a time, resumed after a restart. Everything lands in `build/player/<id>/`, so a
+song solved once starts at once.
+
+Playing:
+- While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges. A paused frame is rendered again with
+  its full N (4 in preview, the shot's own N in final quality), so it shows the film's depth of field, motion blur,
+  soft shadows and anti-aliasing, which a single sub-frame cannot have (docs/RENDERING.md, section 3).
+- The settings menu (gear icon, kept per browser): quality (final also uses the film's full-size reflection, sky and
+  lighting bakes), resolution (the screen's by default, at most 1920 x 1080), sub-frames while playing (1, 2 or 4),
+  SMAA, the full paused frame, and a stats overlay (frame rate, N, size, shot and bar). Quality and resolution reload
+  the page at the same moment.
+- Keys: space plays and pauses, the arrow keys skip 5 s, Home goes to the start, F or a double-click is fullscreen,
+  S shows the stats.
+- URL overrides: `?w=&h=` render size, `?quality=preview|final`, `?t=` start time (film seconds).
+
+Measured:
+- The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
+  piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives
+  their tops to the free hand).
+- The solve takes 8.3 min for 1,100 notes (3:48) and 11.5 min for Clair de lune (1,490 notes, 4:09); the sound render
+  74 s and 93 s.
+- At 1920 x 1080 on an RTX 5070: 56 fps playing at N = 1, 48 at N = 2 (preview, Clair de lune). A paused frame takes
+  50-100 ms at N 4 and about 0.4 s at N 32 in final.
+
 ## Repository layout
 
 ```
@@ -240,10 +283,12 @@ scene/                 the film as a web page (ES modules, import map, no bundle
   src/world/           sky, clouds, terrain, boulders, water, lake bed
   src/piano/           procedural D-class grand and bench, key / hammer / damper / pedal animation
   src/pianist/         pianist loader, skin / hair / cloth materials, tailoring, pose from the tracks
-  src/camera/          shots.js (the edit), lenses, focus, sun arc, hand track
+  src/camera/          shots.js (the edit), auto.js (an edit for any score), lenses, focus, sun arc, hand track
   src/integration/     wiring checks, per-shot looks, motion-blur N boost table, sync probe
   src/perf/            performance track reader
 render/                Node drivers: still, chunked film render, encode + verify, snapshot, determinism, GPU lock
+player/                real-time MIDI player: MIDI to score, solve and sound-render queue, server, player page,
+                       Web Audio piano fallback
 perf/                  performance solver (timing, fingering, keyframes, IK, body, feet, keys, ripples) and QC
 music/                 score DSL, the composition, sampler, mix; final/ = score.json, score.mid, lead sheet, rolls
   presets/, ir/        mix presets; an optional measured-hall impulse response (Git LFS, not used in the mix)

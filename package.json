@@ -10,6 +10,7 @@
   },
   "scripts": {
     "serve": "node render/serve.mjs",
+    "play": "node player/play.mjs",
     "still": "node render/still.mjs",
     "render": "node render/render.mjs",
     "encode": "node render/encode.mjs",
