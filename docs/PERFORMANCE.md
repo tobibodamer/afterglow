@@ -115,11 +115,14 @@ marked `fix round 1` in the code. Section 9 lists them with before/after numbers
    where a finger is on a key, 0.003 between contacts, jerk weight (50 ms / dt)^6), re-solved with the held samples
    stiffened until the path stays within what the fingers absorb (6 mm of fingertip motion, 1.5 mm from touch to key
    bottom): dense passages glide through their positions, every transfer has a bell-shaped speed profile, and a leap
-   away from a held finger still waits for it. On top: rest lifts and phrase-end lift-offs, arm-weight settling after
+   away from a held finger still waits for it. That slack is one-sided along the reference's motion (0.35 s back and
+   ahead): the hand may trail its last move or lead into its next, but a swing against the coming move or past an
+   arrival gets 1.5 mm, so there is no wind-up before a leap and no overshoot after it. On top: rest lifts and phrase-end lift-offs, arm-weight settling after
    loud attacks, a slow settle and drift on every hold longer than 0.6 s (1.5 mm sink, < 1 mm noise), 12 ms zero-phase
    smoothing. `contactPreservingPalm`
    nudges the palm (<= 12 mm / 6 deg, Gauss-Newton, smoothed 10 ms) wherever a finger on its key could not reach it OR
-   its flesh cuts into a neighbouring key. `separateHands` keeps a hand that has no finger on a key >= 10 mm (capsules)
+   its flesh cuts into a neighbouring key. While another finger is still in its stroke, a finger riding its released key
+   up keeps only 15 % of its pull (legato hand-over: it lifts off instead of raising the palm off the landing finger). `separateHands` keeps a hand that has no finger on a key >= 10 mm (capsules)
    from the other hand. After the final release each hand lifts ~2 cm and is lowered onto the thigh in ~1.5 s.
 6. **Fingers per sample** (`fingers.js`, `hand.js`): long fingers: analytic-hierarchical IK (PIP from the MCP-pad
    distance with DIP = 0.67 PIP, 0.58 on black keys; MCP flexion + abduction aim the chain), PIP >= 16 deg in contact
@@ -195,6 +198,8 @@ See section 8 (filled in from the last full run's `build/anim/qc.json`).
 `perf/qc/motion_stats.mjs <perfDir> [m0,m1] [--json f]` (in the repository): hand-motion quality on the written tracks
 (rig FK of the wrist): speed / acceleration / jerk percentiles, the share of playing time the hand is still or moving,
 and every transfer (wrist > 5 cm/s) with duration, peak speed and peak-to-mean ratio (1.875 = a min-jerk reach).
+`qc.json` `summary.over1mm_hotspots`: the one-second windows with the most free / own-key flesh > 1 mm per finger,
+to find where a count changed between two runs (then re-solve that window with `--range`; whole-piece state can differ).
 
 `sandbox/perf/`: `qcsum.mjs <dir>` (QC summary), `kf_stats.mjs [cache]` (keyframe posture percentiles and the strained
 keyframes), `kf_pen.mjs` (keyframe penetration), `kf_probe.mjs R 21.81` (named objective residuals of one keyframe),
@@ -777,6 +782,23 @@ Whole piece vs the code before the round (`--qc-rate 15`, `perf/qc/motion_stats.
 The score bounds the stride leaps: the bass key may rise only once the pedal has caught, so those leaps keep ~150 ms.
 Streaming: `smoothPalmPath` is a banded solve, so a live solver can run it as a fixed-lag smoother over a sliding
 window (lookahead of a few hundred ms); the keyframe solve and the skinned-mesh clearance passes are the costly parts.
+
+Cleanup (same day). id552 (L1 F4, m 107.44): finger 2 rode its released D4 up while the thumb pressed, the nudge lifted
+the palm 7 mm for it and the thumb stalled with its IP pinned at 0 deg (legato hand-over weight above; a contact thumb
+> 1 mm short retries with the free thumb's active set). Easing outliers (`motion_stats` peak/mean speed ratio 4-7): the
+dash fits the score's gap between the last release and the next touch (R 20-30 ms, L strides 65-100 ms), so its speed
+stays; the 5-8 mm wind-up before it and the ~5 mm overshoot after it came from the smoother (one-sided slack above).
+Whole piece vs a fresh run of the previous code (the stored run above came from an earlier state of the same round):
+
+| measure | previous code | cleanup |
+|---|---|---|
+| QC contact p99 / max (mm); hold max; notes off key | 0.53 / 3.96; 1.44; 0 | 0.40 / 0.82; 0.84; 1 (id525 R1 G#4 m 103.76, 0.8 mm, pad past the key edge) |
+| QC own-key / free / neighbour flesh > 1 mm | 208 / 2712 / 28465 | 601 / 2714 / 28324 (own: one-frame blips as a releasing finger meets its rising key, R5 m 11.80, L5 m 200.47) |
+| transfer peak/mean speed p50 (R / L) | 1.98 / 2.29 | 1.84 / 2.10 |
+| wrist jerk RMS (R / L) | 332 / 389 | 330 / 396 |
+
+Left by the score: R m 64.9 thumb deep on A#4 until 26 ms before R4 lands on the front of G5 (60 mm of depth in 40 ms);
+the keyframe planner (finger reach) has to choose compatible contact depths there.
 
 ### Open items (next rounds)
 - (after cycle 2 fix round 2) Bar 22 id322 (above); octave passages keep the thumb ~50-60 mm out (the span allowance:
