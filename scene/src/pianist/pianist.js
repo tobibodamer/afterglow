@@ -1373,6 +1373,18 @@ const RIM_DEFAULTS = { rimHand: 26, rimHair: 4, rimWool: 6, rimShirt: 2.5, rimBu
     }
   }
   pose(0);
+  // culling (core/cull.js): the large skinned meshes split by body region, every skinned mesh bounded per sub-frame
+  if (ctx.core?.SkinnedBounds && ctx.registerBeforeCull) {
+    const REGION_ROOTS = ['wrist_L', 'wrist_R', 'lowerarm01_L', 'lowerarm01_R', 'upperarm01_L', 'upperarm01_R', 'upperleg01_L', 'upperleg01_R', 'neck01'];
+    const regionOf = (b) => { for (let o = skeleton.bones[b]; o && o.isBone; o = o.parent) if (REGION_ROOTS.includes(o.name)) return o.name; return 'torso'; };
+    const regionCache = new Map(), region = (b) => { if (!regionCache.has(b)) regionCache.set(b, regionOf(b)); return regionCache.get(b); };
+    const big = []; group.traverse((o) => { if (o.isSkinnedMesh && o.skeleton === skeleton && o.geometry.index && o.geometry.index.count / 3 > 20000) big.push(o); });
+    for (const o of big) ctx.core.splitSkinned(o, region);
+    const skinned = []; group.traverse((o) => { if (o.isSkinnedMesh && o.frustumCulled !== false) skinned.push(o); });
+    group.updateMatrixWorld(true);
+    const sb = new ctx.core.SkinnedBounds(skinned, { margin: 0.1 });
+    ctx.registerBeforeCull(() => sb.update());
+  }
   let maskOn = false, hidState = false;
   const maskMat = new THREE.MeshBasicMaterial({ name: 'handmask', color: 0x00ff00 });
 

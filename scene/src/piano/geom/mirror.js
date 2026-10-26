@@ -15,6 +15,7 @@ import { polygonNormals, ensureCCW } from './util.js';
 import { FOLD_DECL_GLSL, FOLD_FN_GLSL, FOLD_UNIFORMS, ENV_GRADE_GLSL, CARD_FN_GLSL } from '../materials.js';
 
 export const MIRROR_LAYER = 7;
+const mirrorMeshes = new WeakMap();   // scene -> cullable meshes on MIRROR_LAYER (collected on the first mirror pass)
 
 const MIRROR_SHADER = {
   name: 'AG.piano.lacquerMirror',
@@ -117,6 +118,50 @@ export function buildPlanarMirror(pts, matrix, { name = 'mirror', width = 960, h
   // mirror pass: main camera only, layer MIRROR_LAYER only, cleared to alpha 0, no scene background
   const reflect = mesh.onBeforeRender;
   const clear = new THREE.Color();
+  const rt = mesh.getRenderTarget();
+  // The face reads the reflection only at its own texture coordinates (textureMatrix x the face, plus the orange-peel
+  // offset < 0.0012 in uv), so the pass is scissored to the face's rectangle in the reflection texture plus that margin
+  // and a texel for the bilinear taps: pixels outside it are never read. The reflection camera is posed exactly as
+  // Reflector.onBeforeRender poses it (mirrored eye, reflected look-at and up), before that pass runs.
+  const corners = v2.map((v) => new THREE.Vector4(v.x, v.y, 0, 1));
+  const cp = new THREE.Vector4(), tm = new THREE.Matrix4(), rcam = new THREE.PerspectiveCamera();
+  const rotM = new THREE.Matrix4(), nrm = new THREE.Vector3(), mirP = new THREE.Vector3(), eye = new THREE.Vector3(), look = new THREE.Vector3(), tgt = new THREE.Vector3();
+  const scissorTo = (camera) => {
+    mirP.setFromMatrixPosition(mesh.matrixWorld); eye.setFromMatrixPosition(camera.matrixWorld);
+    rotM.extractRotation(mesh.matrixWorld); nrm.set(0, 0, 1).applyMatrix4(rotM);
+    const view = mirP.clone().sub(eye);
+    if (view.dot(nrm) > 0) return false;                 // facing away: Reflector skips the pass
+    view.reflect(nrm).negate().add(mirP);
+    rotM.extractRotation(camera.matrixWorld);
+    look.set(0, 0, -1).applyMatrix4(rotM).add(eye);
+    tgt.subVectors(mirP, look).reflect(nrm).negate().add(mirP);
+    rcam.position.copy(view); rcam.up.set(0, 1, 0).applyMatrix4(rotM).reflect(nrm); rcam.lookAt(tgt); rcam.updateMatrixWorld();
+    tm.multiplyMatrices(camera.projectionMatrix, rcam.matrixWorldInverse).multiply(mesh.matrixWorld);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const c of corners) {
+      cp.copy(c).applyMatrix4(tm);
+      if (!(cp.w > 1e-6)) return false;                 // a corner behind the eye: render the whole target
+      const x = 0.5 + 0.5 * cp.x / cp.w, y = 0.5 + 0.5 * cp.y / cp.w;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    }
+    const W = rt.width, H = rt.height, m = 0.0012;
+    const px0 = Math.max(0, Math.floor((x0 - m) * W) - 2), px1 = Math.min(W, Math.ceil((x1 + m) * W) + 2);
+    const py0 = Math.max(0, Math.floor((y0 - m) * H) - 2), py1 = Math.min(H, Math.ceil((y1 + m) * H) + 2);
+    if (px1 <= px0 || py1 <= py0) return false;
+    rt.scissor.set(px0, py0, px1 - px0, py1 - py0);
+    // culling frustum of the scissored region (the un-clipped projection: the oblique near plane only removes more)
+    const ax = 2 * px0 / W - 1, bx = 2 * px1 / W - 1, ay = 2 * py0 / H - 1, by = 2 * py1 / H - 1;
+    sub.set(2 / (bx - ax), 0, 0, -(ax + bx) / (bx - ax), 0, 2 / (by - ay), 0, -(ay + by) / (by - ay), 0, 0, 1, 0, 0, 0, 0, 1);
+    cullFrustum.setFromProjectionMatrix(sub.multiply(camera.projectionMatrix).multiply(rcam.matrixWorldInverse));
+    return true;
+  };
+  // meshes this pass can draw (MIRROR_LAYER) that lie entirely outside the scissored region are hidden for the pass
+  const sub = new THREE.Matrix4(), cullFrustum = new THREE.Frustum(), hidden = [];
+  const cullOutside = (scene) => {
+    let list = mirrorMeshes.get(scene);
+    if (!list) { list = []; scene.traverse((o) => { if (o.isMesh && o.frustumCulled && o.layers.isEnabled(MIRROR_LAYER) && !o.isReflector) list.push(o); }); mirrorMeshes.set(scene, list); }
+    for (const o of list) if (o.visible && !cullFrustum.intersectsObject(o)) { o.visible = false; hidden.push(o); }
+  };
   mesh.isMainCamera = () => true;
   mesh.onBeforeRender = function (renderer, scene, camera, geometry, material, group) {
     const main = mesh.isMainCamera(camera);
@@ -126,7 +171,13 @@ export function buildPlanarMirror(pts, matrix, { name = 'mirror', width = 960, h
     mesh.getReflectionCamera(camera).layers.set(MIRROR_LAYER);
     renderer.getClearColor(clear); const ca = renderer.getClearAlpha(); const bg = scene.background;
     renderer.setClearColor(0x000000, 0); scene.background = null;
-    try { reflect.call(this, renderer, scene, camera, geometry, material, group); } finally { renderer.setClearColor(clear, ca); scene.background = bg; }
+    rt.scissorTest = scissorTo(camera);
+    if (rt.scissorTest) cullOutside(scene);
+    try { reflect.call(this, renderer, scene, camera, geometry, material, group); } finally {
+      rt.scissorTest = false; renderer.setClearColor(clear, ca); scene.background = bg;
+      for (const o of hidden) o.visible = true;
+      hidden.length = 0;
+    }
   };
 
   const centreLocal = new THREE.Vector3(); v2.forEach((v) => { centreLocal.x += v.x; centreLocal.y += v.y; }); centreLocal.multiplyScalar(1 / v2.length);

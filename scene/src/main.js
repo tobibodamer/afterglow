@@ -34,6 +34,8 @@ import { loadData, loadDataMap, urlExists } from './core/data.js';
 import { CubeProbe, withAutoClear } from './core/envprobe.js';
 import { createRenderer, gpuInfo, syncGPU, watchContext } from './core/gpu.js';
 import { loadLut, lutTexture, parseCube, fromFloat32 } from './core/lut.js';
+import { GpuProfiler } from './core/profiler.js';
+import { SkinnedBounds, boundInstanced, splitSkinned } from './core/cull.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // MODULE CONFIG. Slots load in this order. 'auto' (the default policy) uses the real module when its file exists and
@@ -115,7 +117,7 @@ function normalizeBakes(b) {
 }
 
 export function createFilm() {
-  const S = { initDone: false, modules: [], hooks: { sky: [], env: [], pre: [] }, bakes: [], lastShotKey: null, last: null, lutCache: new Map() };
+  const S = { initDone: false, modules: [], hooks: { sky: [], env: [], pre: [], cull: [] }, bakes: [], lastShotKey: null, last: null, lutCache: new Map() };
 
   async function resolveModules(policy = 'auto') {
     const list = [];
@@ -239,6 +241,8 @@ export function createFilm() {
       S.renderer = renderer;
       S.ctxWatch = watchContext(renderer, () => S.curFrame ?? null);   // a context loss fails every later frame
       S.gpu = gpuInfo(renderer);
+      // per-pass GPU timings (render/profile.mjs); off in every film render
+      S.prof = opts.profile ? new GpuProfiler(renderer) : null;
       if (!S.gpu.colorBufferFloat || !S.gpu.floatBlend) throw new Error(`GPU lacks float render targets / float blending: ${JSON.stringify(S.gpu)}`);
 
       const scene = new THREE.Scene(); scene.name = 'AG.scene';
@@ -246,6 +250,10 @@ export function createFilm() {
       const rigGroup = new THREE.Group(); rigGroup.name = 'rigGroup';
       rigGroup.rotation.y = BASE_RIG_YAW_DEG * D2R;
       scene.add(worldGroup, rigGroup); scene.updateMatrixWorld(true);
+      // bounds of GPU-animated meshes (core/cull.js): refreshed once per sub-frame, after three updates the world
+      // matrices and before it culls, in whichever pass renders the scene first
+      let cullKey = null;
+      scene.onBeforeRender = () => { if (cullKey !== S.ctx?.subframe) { cullKey = S.ctx?.subframe; for (const fn of S.hooks.cull) fn(); } };
       const camera = new THREE.PerspectiveCamera(40, width / height, DEFAULT_CAMERA.near, DEFAULT_CAMERA.far);
       camera.filmGauge = 36; camera.name = 'AG.camera';
       scene.add(camera);
@@ -306,8 +314,9 @@ export function createFilm() {
         registerSkyBake: (fn) => { S.hooks.sky.push(fn); },
         registerEnvCapture: (fn) => { S.hooks.env.push(fn); },
         registerPreSubframe: (fn) => { S.hooks.pre.push(fn); },
+        registerBeforeCull: (fn) => { S.hooks.cull.push(fn); },
         registerGradePreset: (name, params) => { GRADE_PRESETS[name] = params; },
-        core: { CubeProbe, withAutoClear, lens: LENS, rng: RNG, glsl: GLSL, sun: { dirFromAzEl, sunElevationAt }, accum: S.accum, final: S.final },
+        core: { CubeProbe, withAutoClear, SkinnedBounds, boundInstanced, splitSkinned, lens: LENS, rng: RNG, glsl: GLSL, sun: { dirFromAzEl, sunElevationAt }, accum: S.accum, final: S.final },
       };
       S.ctx = ctx;
       window.__AG_CTX = ctx; // debugging only
@@ -342,6 +351,7 @@ export function createFilm() {
       renderer.compile(scene, camera);
       if (opts.warmup !== false) await AG.renderFrame(opts.warmupFrame ?? 0, { N: 1, transfer: 'none' });
       S.timings.compile = now() - tc;
+      if (S.prof) await S.prof.collect();
       S.timings.init = now() - t0;
       S.initDone = true;
       return AG.info();
@@ -359,6 +369,9 @@ export function createFilm() {
       S.ctxWatch.check(`start of frame ${frame}`);
       const { renderer: r, scene, camera, accum, ctx } = S;
       const T = {}; const tStart = now(); let tp = tStart; const lap = (k) => { const n = now(); T[k] = (T[k] || 0) + (n - tp); tp = n; };
+      const phase = (p) => S.prof?.setPhase(p);
+      const timed = S.prof ? (label, fn) => S.prof.time(label, fn) : (label, fn) => fn();
+      phase('prep');
       const t = frameToTime(frame), m = filmToMusic(t);
       const override = opts.camera !== undefined ? opts.camera : S.director.override;
       const shot = S.director.shotAt(t, override);
@@ -376,17 +389,17 @@ export function createFilm() {
       // 1. camera at the frame centre (no aperture offset, no jitter), per-frame prep, pose at the frame centre
       const centreLens = applyCameraState(S.director.stateAt(t, shot, override), S.aspect);
       ctx.subframe = makeSub(-1, st.N, t, null, centreLens, frame);
-      for (const mod of S.modules) mod.inst.beforeFrame?.(frame, t, info);
-      for (const mod of S.modules) mod.inst.update?.(t, ctx.subframe);
+      for (const mod of S.modules) timed(`${mod.slot}.beforeFrame`, () => mod.inst.beforeFrame?.(frame, t, info));
+      for (const mod of S.modules) timed(`${mod.slot}.update`, () => mod.inst.update?.(t, ctx.subframe));
       scene.updateMatrixWorld(true);
-      lap('prep');
+      lap('prep'); phase('skyBake');
       // 2. sky bakes, module bakes, environment captures
       for (const fn of S.hooks.sky) await fn(info);
-      lap('skyBake');
+      lap('skyBake'); phase('bakes');
       for (const b of S.bakes) if ((b.when === 'shot' && shotChanged) || b.when === 'frame') await b.run(info);
-      lap('bakes');
+      lap('bakes'); phase('envCapture');
       for (const fn of S.hooks.env) await fn(info);
-      lap('envCapture');
+      lap('envCapture'); phase('subframes');
 
       // 3. sub-frames
       accum.clear();
@@ -400,9 +413,9 @@ export function createFilm() {
         lens = applyCameraState(S.director.stateAt(tk, shot, override), S.aspect);
         const sub = makeSub(s.k, N, tk, s, lens, frame);
         ctx.subframe = sub;
-        for (const mod of S.modules) mod.inst.update?.(tk, sub);
+        for (const mod of S.modules) timed(`${mod.slot}.update`, () => mod.inst.update?.(tk, sub));
         accum.applyLensAndJitter(camera, s, lens);   // thin-lens eye offset + focal-plane shear + pixel jitter
-        for (const fn of S.hooks.pre) fn(sub);
+        for (const fn of S.hooks.pre) timed('preSubframe', () => fn(sub));
         accum.renderSub(scene, camera, s.k, N);      // render() updates world matrices itself
       }
       if (opts.sync !== false) {
@@ -412,7 +425,7 @@ export function createFilm() {
         S.ctxWatch.check(`frame ${frame} after ${N} sub-frames`);
         if (!(Math.abs(alpha - 1) < 1e-3)) throw new Error(`frame ${frame}: accumulation weight at pixel (0,0) is ${alpha}, expected 1 (readback failed or the accumulation target was reset)`);
       }
-      lap('subframes');
+      lap('subframes'); phase('final');
 
       // 4. final pass
       // LUT: the shot's own grade.lut, else its class LUT (wides), else the session LUT
@@ -421,7 +434,7 @@ export function createFilm() {
       const depth ={ texture: accum.sceneRT.depthTexture, near: camera.near, far: camera.far, K: LENS.cocInfPx(lens, S.width), focus: lens.focusDist };
       S.final.render({ accumTexture: accum.accumRT.texture, frame, grade: st.grade, lutTex, debugView: st.debugView, depth });
       S.lastFinal = { frame, grade: st.grade, lutTex, depth };
-      lap('final');
+      lap('final'); phase('output');
 
       // 5. output
       await output(frame, opts, T, () => { tp = now(); }, lap);
@@ -432,6 +445,7 @@ export function createFilm() {
         lens: { focalMm: +lens.focalMm.toFixed(3), fStop: lens.fStop, focusDist: +lens.focusDist.toFixed(4) },
         camera: { pos: camera.position.toArray().map((v) => +v.toFixed(4)), source: override ? 'override' : S.director.source },
         sun: { azimuthDeg: ctx.sun.azimuthDeg, elevationDeg: +ctx.sun.elevationDeg.toFixed(4) }, gradePreset: st.gradePreset, final: S.final.stats };
+      if (S.prof) S.last.profile = await S.prof.collect();
       return S.last;
     },
 

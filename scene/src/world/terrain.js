@@ -925,11 +925,63 @@ export function makeTerrainMaterial(P, shared) {
   return mat;
 }
 
+/**
+ * Split an indexed geometry into chunks by triangle centroid (azimuth sector x distance ring around the origin) that
+ * share its attributes, so every pass (main, reflection, the six cube faces) frustum-culls the chunks it cannot see.
+ * Triangles keep their order inside a chunk, and the terrain is one non-overlapping height field, so the rasterised
+ * pixels are the same as drawing the whole mesh.
+ */
+export const TERRAIN_CHUNKS = Object.freeze({ sectors: 24, rings: [600, 2000, 6000, 18000] });
+export function chunkGeometry(geometry, { sectors = TERRAIN_CHUNKS.sectors, rings = TERRAIN_CHUNKS.rings } = {}) {
+  const pos = geometry.attributes.position.array, idx = geometry.index.array;
+  const nRing = rings.length + 1, lists = Array.from({ length: sectors * nRing }, () => []);
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
+    const x = (pos[a] + pos[b] + pos[c]) / 3, z = (pos[a + 2] + pos[b + 2] + pos[c + 2]) / 3;
+    const s = Math.min(sectors - 1, Math.floor(((Math.atan2(z, x) / (2 * Math.PI)) + 0.5) * sectors));
+    const d = Math.hypot(x, z); let r = 0; while (r < rings.length && d >= rings[r]) r++;
+    lists[s * nRing + r].push(t);
+  }
+  const out = [];
+  // chunks in the order of their first triangle. Every chunk sits at the origin, so three's opaque sort (by object
+  // position, then id) draws them in this order in every pass: the few depth ties along welded patch seams resolve the
+  // same way in every frame
+  for (const l of lists.filter((x) => x.length).sort((x, y) => x[0] - y[0])) {
+    const ix = new (idx.constructor)(l.length * 3);
+    l.forEach((t, i) => { ix[3 * i] = idx[t]; ix[3 * i + 1] = idx[t + 1]; ix[3 * i + 2] = idx[t + 2]; });
+    const g = new THREE.BufferGeometry();
+    for (const [k, v] of Object.entries(geometry.attributes)) g.setAttribute(k, v);
+    g.setIndex(new THREE.BufferAttribute(ix, 1));
+    // the bounds of this chunk's own vertices (computeBoundingSphere would span the whole shared position buffer)
+    const box = new THREE.Box3(), v = new THREE.Vector3();
+    for (let i = 0; i < ix.length; i++) box.expandByPoint(v.fromArray(pos, ix[i] * 3));
+    g.boundingBox = box;
+    g.boundingSphere = box.getBoundingSphere(new THREE.Sphere());
+    let r2 = 0;
+    for (let i = 0; i < ix.length; i++) r2 = Math.max(r2, g.boundingSphere.center.distanceToSquared(v.fromArray(pos, ix[i] * 3)));
+    g.boundingSphere.radius = Math.sqrt(r2);
+    out.push(g);
+  }
+  return out;
+}
+
+export function chunkMesh(geometry, material, name, i) {
+  const m = new THREE.Mesh(geometry, material); m.name = `${name}.${i}`;
+  return m;
+}
+
+/** a Group of culled chunk meshes of `geometry` with `material` (TERRAIN_CHUNKS) */
+export function chunkedMesh(geometry, material, name) {
+  const group = new THREE.Group(); group.name = name;
+  chunkGeometry(geometry).forEach((g, i) => group.add(chunkMesh(g, material, name, i)));
+  return group;
+}
+
 export function makeTerrain(P, shared, height) {
   const { geometry, triangles, trianglesBeforeCull, vertices } = buildTerrainGeometry(P, height);
   const mesh = new THREE.Mesh(geometry, makeTerrainMaterial(P, shared));
   mesh.name = 'AG.world.terrain';
-  mesh.frustumCulled = false;
-  mesh.layers.enable(ENV_LAYER);
-  return { mesh, stats: { triangles, trianglesBeforeCull, vertices } };
+  const chunks = chunkedMesh(geometry, mesh.material, 'AG.world.terrain');
+  chunks.traverse((o) => o.layers.enable(ENV_LAYER));
+  return { mesh, chunks, stats: { triangles, trianglesBeforeCull, vertices, chunks: chunks.children.length } };
 }
