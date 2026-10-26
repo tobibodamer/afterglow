@@ -161,6 +161,7 @@ export function palmBase(P, t) {
 export const PATH_TAU = 0.05;        // s: smoothing time constant where the stiffness is 1 (cutoff ~3 Hz)
 const W_CONTACT = 1, W_FREE = 0.003;
 const TOL_HOLD = 0.006, TOL_LAND = 0.0015;   // m of fingertip motion the fingers absorb (wrist shift + 95 mm lever x turn)
+const TOL_SWING = 0.0015, SWING_LOOK = 0.35;   // m of wind-up against the coming move / overshoot past the arrival; s looked ahead and back
 
 /**
  * Minimum-jerk palm path: per channel (position xyz, rotation vector about the first keyframe) the x minimising
@@ -170,12 +171,14 @@ const TOL_HOLD = 0.006, TOL_LAND = 0.0015;   // m of fingertip motion the finger
  * Where a finger is on a key the path may leave the reference only as far as the finger absorbs (TOL_HOLD; TOL_LAND
  * from touch to key bottom, where the hand must be set): those samples are stiffened and the system re-solved until
  * they are within tolerance. Small shifts in dense passages therefore glide through the held positions, while a hand
- * that leaps away from a held finger still waits for it. Ramps of 50 ms before a touch and 30 ms after a release keep
+ * that leaps away from a held finger still waits for it. Along the reference's motion (SWING_LOOK back and ahead) the slack
+ * is one-sided: the hand may trail its last move or lead into its next, but a wind-up against the coming move or an
+ * overshoot past an arrival (the smoother's side lobes) gets only TOL_SWING. Ramps of 50 ms before a touch and 30 ms after a release keep
  * the weights from switching in one sample. Returns { p, q } (arrays of N), the solves used and the samples still over
  * tolerance after the last one.
  */
 export function smoothPalmPath(P, notes, t0, dt, N, tau = PATH_TAU) {
-  const w = new Float64Array(N).fill(W_FREE), tol = new Float64Array(N).fill(Infinity);
+  const w = new Float64Array(N).fill(W_FREE), tol = new Float64Array(N).fill(Infinity), tolS = new Float64Array(N).fill(Infinity);
   for (const n of notes) {
     if (!n.P0) continue;
     const ta = touchT(n) - 0.015, tu = upT(n), tk = Math.max(ta, n.tm.tKb + 0.015);
@@ -184,7 +187,7 @@ export function smoothPalmPath(P, notes, t0, dt, N, tau = PATH_TAU) {
       const t = t0 + i * dt;
       const c = t < ta ? smoothstep(ta - 0.05, ta, t) : t > tu ? 1 - smoothstep(tu, tu + 0.03, t) : 1;
       w[i] = Math.max(w[i], W_FREE + (W_CONTACT - W_FREE) * c);
-      if (c > 0.05) tol[i] = Math.min(tol[i], (t >= ta && t <= tk ? TOL_LAND : TOL_HOLD) / c);
+      if (c > 0.05) { tol[i] = Math.min(tol[i], (t >= ta && t <= tk ? TOL_LAND : TOL_HOLD) / c); tolS[i] = Math.min(tolS[i], TOL_SWING / c); }
     }
   }
   const ref = new Array(N); for (let i = 0; i < N; i++) ref[i] = palmBase(P, t0 + i * dt);
@@ -194,6 +197,11 @@ export function smoothPalmPath(P, notes, t0, dt, N, tau = PATH_TAU) {
     const r = qLog(qMul(ref[i].q, qConj(qref)));
     ch[0][i] = ref[i].p[0]; ch[1][i] = ref[i].p[1]; ch[2][i] = ref[i].p[2]; ch[3][i] = r[0]; ch[4][i] = r[1]; ch[5][i] = r[2];
   }
+  // unit directions (6-D, rotation scaled to fingertip metres) to where the reference is SWING_LOOK ahead / came from behind
+  const K = Math.round(SWING_LOOK / dt);
+  const dirTo = (i, j) => { const v = [0, 1, 2, 3, 4, 5].map((k) => (ch[k][j] - ch[k][i]) * (k < 3 ? 1 : 0.095)); const l = Math.hypot(...v); return l > 0.004 ? v.map((x) => x / l) : null; };
+  const uNext = new Array(N).fill(null), uPrev = new Array(N).fill(null);
+  for (let i = 0; i < N; i++) if (tol[i] !== Infinity) { uNext[i] = dirTo(i, Math.min(N - 1, i + K)); uPrev[i] = dirTo(Math.max(0, i - K), i); }
   const lam = (tau / dt) ** 6;
   let sm, it = 0, over = 0;
   for (; it < 10; it++) {
@@ -202,8 +210,13 @@ export function smoothPalmPath(P, notes, t0, dt, N, tau = PATH_TAU) {
     over = 0;
     for (let i = 0; i < N; i++) {
       if (tol[i] === Infinity) continue;
-      const dev = Math.hypot(sm[0][i] - ch[0][i], sm[1][i] - ch[1][i], sm[2][i] - ch[2][i]) + 0.095 * Math.hypot(sm[3][i] - ch[3][i], sm[4][i] - ch[4][i], sm[5][i] - ch[5][i]);
-      if (dev > tol[i] * 1.05) { w[i] *= Math.min(16, (dev / tol[i]) ** 2); over++; }
+      const e = [0, 1, 2, 3, 4, 5].map((k) => (sm[k][i] - ch[k][i]) * (k < 3 ? 1 : 0.095));
+      const dev = Math.hypot(e[0], e[1], e[2]) + Math.hypot(e[3], e[4], e[5]);
+      // a lag behind the last move or a lead into the next is slack; past the last move AND against the next is a swing
+      const past = uPrev[i] ? e.reduce((a, x, k) => a + x * uPrev[i][k], 0) : Infinity, against = uNext[i] ? -e.reduce((a, x, k) => a + x * uNext[i][k], 0) : Infinity;
+      const swing = uPrev[i] || uNext[i] ? Math.max(0, Math.min(past, against)) : 0;
+      const x = Math.max(dev / tol[i], swing / tolS[i]);
+      if (x > 1.05) { w[i] *= Math.min(16, x * x); over++; }
     }
     if (!over) break;
   }
