@@ -3,6 +3,7 @@
 // module, in headless Chrome. docs/PERFORMANCE.md.
 //   node perf/qc/render_qc.mjs sheet  [--perf build/anim] [--n 24] [--piano simple|real] [--out build/anim/qc]
 //   node perf/qc/render_qc.mjs clip   --m0 <music s> [--dur 2] [--view ref7R|ref7L|ref12R|ref12L|topBoth|wideR] [--name x]
+//                                     [--camfrom <perfDir>]   (frame the camera on another run: identical A/B shots)
 //   node perf/qc/render_qc.mjs frames --m 12.3,40.1 [--views ref7R,ref12R,topBoth]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -81,7 +82,10 @@ if (mode === 'sheet') {
   const w = +(args.w || 960), h = +(args.h || 540);
   const dir = path.join(outDir, name); fs.mkdirSync(dir, { recursive: true });
   // fixed camera from the middle of the window (a locked-off shot, so motion reads)
+  const load = (d) => page.evaluate((j, b) => window.QC.loadTracks(j, b), `/${d.replaceAll('\\', '/')}/perf.json`, `/${d.replaceAll('\\', '/')}/perf.bin`);
+  if (args.camfrom) await load(args.camfrom);
   const V = await views(m0 + dur / 2 + MO); const cam = V[view];
+  if (args.camfrom) await load(perfDir);
   const strip = []; const nF = Math.round(dur * fps);
   for (let f = 0; f < nF; f++) {
     const t = m0 + MO + f / fps; await page.evaluate((tt) => window.QC.poseAt(tt), t);

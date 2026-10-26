@@ -68,7 +68,7 @@ export function runQC(res, { out, command, range, rateQC = 60 } = {}) {
 
   // ---------------------------------------------------------------- per-frame checks at the film rate
   const step = Math.max(1, Math.round(1 / (rateQC * dt)));
-  const pen = { white: [], black: [], fallboard: [], keyslip: [] }; const worstPen = []; const penCls = {};
+  const pen = { white: [], black: [], fallboard: [], keyslip: [] }; const worstPen = []; const penCls = {}; const freeByF = {};
   const ff = []; const worstFF = []; const handHand = [];
   const limitViol = []; const wristStats = { R: [], L: [] }; const wristOut = { R: 0, L: 0 }; let frames = 0;
   const angVel = {}; const popCount = {}; let prevLocal = null; let prevI = -1; const prevW = [], prevAcc = []; const jerk = {};
@@ -96,6 +96,7 @@ export function runQC(res, { out, command, range, rateQC = 60 } = {}) {
           const cat = r.part; const d = r.depth;
           if (cls === 'own' && d < 0.0008) continue;
           pen[cat].push(d); penCls[cls] = penCls[cls] || []; penCls[cls].push(d);
+          if (cls === 'free' && d > 0.001) freeByF[`${s}${vf}`] = (freeByF[`${s}${vf}`] || 0) + 1;
           if (d > 0.0005) worstPen.push({ t: +t.toFixed(3), hand: s, part: cat, cls, key: r.key >= 0 ? KEYS[r.key].name : '', contactKey: ck !== undefined ? KEYS[ck].name : '', joint: rig.joints[v.dom].name, mm: +(d * 1000).toFixed(2) });
         }
       }
@@ -180,6 +181,7 @@ export function runQC(res, { out, command, range, rateQC = 60 } = {}) {
     command, frames_checked: frames, qc_rate_hz: Math.round(1 / (step * dt)), notes_checked: rows.length,
     contact_error_mm: { p50: pmm(contactErr, 50), p99: pmm(contactErr, 99), max: maxmm(contactErr), during_hold_p99: pmm(holdErr, 99), during_hold_max: maxmm(holdErr), notes_off_key: rows.filter((r) => !r.on_key).length },
     penetration_mm: Object.fromEntries(Object.entries(pen).map(([k, a]) => [k, { count: a.length, p99: pmm(a, 99), max: maxmm(a), over1mm: a.filter((x) => x > 0.001).length }])),
+    free_over1mm_by_finger: freeByF,
     penetration_by_class_mm: Object.fromEntries(Object.entries(penCls).map(([k, a]) => [k, { count: a.length, p99: pmm(a, 99), max: maxmm(a), over1mm: a.filter((x) => x > 0.001).length }])),
     finger_finger_mm: { count: ff.length, p99: pmm(ff, 99), max: maxmm(ff), over1mm: ff.filter((x) => x > 0.001).length, bind_pose_worst: ffBind },
     hand_hand_overlap: { frames: handHand.length, worst_mm: handHand.length ? handHand[0].mm : 0 },
