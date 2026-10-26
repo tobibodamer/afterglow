@@ -10,7 +10,7 @@ import { handFeatures, wristAngles, elbowPos, bestSwivel } from './palm.js';
 import { HandPlanner, resolveFingerTiming, releaseForReach, releaseForTravel, planRestrikes, T_UP_AFTER_REL0, rel0Of, UNCOVERED_EARLY } from './plan.js';
 import { spanLimits } from './fingering.js';
 import { smoothPalmPath } from './trajectory.js';
-import { FingerAnimator, touchT, upT } from './fingers.js';
+import { FingerAnimator, articulate, touchT, upT, ATT_SINK_TAU } from './fingers.js';
 import { KeyTracks } from './keys.js';
 import { BodyMotion, bodyLocals, springFilter } from './body.js';
 import { fingerHand } from './fingering.js';
@@ -55,7 +55,9 @@ export async function solve(opts) {
       const chord = hs.filter((m) => Math.abs(m.t_on - n.t_on) < 0.03);
       const before = hs.filter((m) => m.t_on < n.t_on - 0.03); const lastOff = before.length ? Math.max(...before.map((m) => m.t_off)) : -9;
       const detached = n.t_on - lastOff > 0.25;
-      const touch = n.vel > 95 || (chord.length >= 3 && n.vel >= 85 && detached) ? 'struck' : 'pressed';
+      // strike round: from mf up, a note the hand comes to from the air (nothing of it sounding 60 ms before) is struck;
+      // legato lines keep the press from the key surface
+      const touch = n.vel > 95 || (chord.length >= 3 && n.vel >= 85 && detached) || (n.vel >= 58 && n.t_on - lastOff > 0.06) ? 'struck' : 'pressed';
       n.tm = noteTiming(n, touch);
     }
     // leap arrivals: a group the hand must leap to, with too little time between the previous group's key bottom and
@@ -286,6 +288,7 @@ export async function solve(opts) {
 
   // ------------------------------------------------------------------ palm samples (with musical vertical offsets) + lag
   const palmS = {}, lagS = {};
+  for (const s of ['R', 'L']) { articulate(planNotes[s]); const na = planNotes[s].filter((n) => n.att).length; log(`[solve] ${s}: struck notes carried by the hand's attack: ${na} (hand speed at the touch p50 ${na ? planNotes[s].filter((n) => n.att).map((n) => n.vHand).sort((a, b) => a - b)[na >> 1].toFixed(2) : 0} m/s)`); }
   for (const s of ['R', 'L']) {
     const P = planners[s]; const ps = new Array(N), qs = new Array(N);
     const off = verticalOffsets(P, planNotes[s], t0, dt, N);
@@ -302,7 +305,7 @@ export async function solve(opts) {
     // keys held through a transfer between two keyframes: nudge the palm so every finger on a key can stay on it
     const fixStats = contactPreservingPalm(hands[s], planNotes[s], sm, { t0, dt, range, keyAngle, keyArrays, thumbPrefAt: (id, t) => thumbPrefAt(s, id, t) });
     log(`[solve] ${s}: palm nudged at ${fixStats.nudged} samples to keep held fingers on their keys (max ${(fixStats.maxShift * 1000).toFixed(1)} mm, residual max ${(fixStats.maxResid * 1000).toFixed(2)} mm at ${fixStats.tResid.toFixed(2)}, max shift at ${fixStats.tMax.toFixed(2)})`);
-    palmS[s] = sm;
+    sm.att = off.att; palmS[s] = sm;
   }
   // fix round 1 (critic: the resting RH thumb and the playing LH thumb passed through each other at m 82.7-83.1): a hand
   // with no finger on a key keeps >= 6 mm between its capsules and the other hand's, moving out and up smoothly
@@ -395,7 +398,8 @@ export async function solve(opts) {
       };
       const palmAt = (tt) => { const j = clamp(Math.round((tt - t0) / dt), 0, N - 1); return { q: palmS[s].q[j], p: palmS[s].p[j] }; };
       const mcpW = (f) => { const bb = H.baseOf(f, palm); return add(bb.p, qRot(bb.q, H.J[H.fj[f][0]].t)); };
-      const env = { palm, palmAt, hoverW: null, contactsNow: null, mcpW };
+      const attAt = (tt) => palmS[s].att[clamp(Math.round((tt - t0) / dt), 0, N - 1)];
+      const env = { palm, palmAt, attAt, hoverW: null, contactsNow: null, mcpW };
       const contactsNow = [];
       const targets = {};
       for (let f = 1; f <= 5; f++) { env.hoverW = hoverW(f); targets[f] = animators[s].target(f, t, env); if (targets[f].mode === 'contact') contactsNow.push({ f, key: targets[f].note.key }); }
@@ -752,12 +756,23 @@ function verticalOffsets(P, notes, t0, dt, N) {
       y[i] = Math.max(y[i], h * w); z[i] = Math.min(z[i], -0.25 * h * w);
     }
   }
-  // arm weight: after loud attacks the wrist settles 1-4 mm and recovers (damped impulse)
-  for (const n of notes) if (n.vel >= 75) {
+  // the hand's attack on struck groups (fingers.js articulate): rise h (min-jerk), fall with uniform acceleration onto the
+  // keys at v, sink with them (-v s e^(-s/tau), velocity continuous at the touch) and recover
+  const att = new Float32Array(N);
+  for (const A of new Set(notes.map((n) => n.att).filter(Boolean))) {
+    const t0a = A.tT - A.Ld; const i0 = Math.max(0, Math.floor((A.tR - t0) / dt)), i1 = Math.min(N - 1, Math.ceil((A.tT + 0.3 - t0) / dt));
+    for (let i = i0; i <= i1; i++) {
+      const t = t0 + i * dt;
+      att[i] += t < t0a ? A.h * minjerk((t - A.tR) / (t0a - A.tR)) : t < A.tT ? A.h * (1 - ((t - t0a) / A.Ld) ** 2) : -A.v * (t - A.tT) * Math.exp(-(t - A.tT) / ATT_SINK_TAU);
+    }
+  }
+  for (let i = 0; i < N; i++) y[i] += att[i];
+  // arm weight: after loud attacks the hand does not carry, the wrist settles 1-4 mm and recovers (damped impulse)
+  for (const n of notes) if (n.vel >= 75 && !n.att) {
     const amp = 0.001 + 0.003 * clamp((n.vel - 75) / 40, 0, 1); const i0 = Math.max(0, Math.floor((n.t_on - t0) / dt)), i1 = Math.min(N - 1, i0 + Math.round(0.4 / dt));
     for (let i = i0; i <= i1; i++) { const s = (t0 + i * dt - n.t_on); const w = 1.678 / 0.06; y[i] -= amp * (w * s) * Math.exp(-w * s) * Math.E; }
   }
-  return { x, y, z };
+  return { x, y, z, att };
 }
 
 /** contact fingers' PIP range: hand.js contactPip(f) (fix round 1: 16 deg for fingers 2-4, 9 for the 5th; was 4) */

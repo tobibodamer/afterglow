@@ -19,24 +19,50 @@ const herm = (y0, v0, y1, v1, u) => { const u2 = u * u, u3 = u2 * u; return (2 *
 const toL = (P, w) => qRot(qConj(P.q), sub(w, P.p));
 const toW = (P, l) => add(P.p, qRot(P.q, l));
 
+/**
+ * Per-note articulation of one hand's notes (before the palm path: the hand's attack is part of it).
+ * apex / apexLead: the finger's lift and its lead before the touch; vfk: the pad's speed at the touch (struck; pressed
+ * notes land at rest); liftOff after the release. A struck onset group is carried into the keys by the hand: the palm
+ * rises h, falls with uniform acceleration (no braking) and meets the keys at vHand, then sinks with them and recovers
+ * (n.att, rendered by solver.js verticalOffsets). The hand does not drop while another finger of it holds a key (legato)
+ * and little in fast passages (the fingers play those); the finger adds the rest (vfk - vHand) with its own drop.
+ */
+export const V_HAND_MAX = 0.35, ATT_SINK_TAU = 0.02;
+export function articulate(notes) {
+  const hs = notes.slice().sort((a, b) => a.t_on - b.t_on);
+  for (let i = 0; i < hs.length; i++) {
+    const n = hs[i]; const nv = clamp((n.vel - 20) / 100, 0, 1);
+    let prevOn = null; for (let j = i - 1; j >= 0; j--) if (hs[j].t_on < n.t_on - 0.03) { prevOn = hs[j]; break; }
+    const ioiPrev = prevOn ? n.t_on - prevOn.t_on : 1.0;
+    n.apex = n.tm.touch === 'struck' ? 0.008 + 0.027 * nv : 0.002 + 0.006 * nv + (ioiPrev > 0.4 ? 0.004 : 0);
+    n.apexLead = clamp(0.4 * ioiPrev, 0.05, 0.15);
+    n.vfk = n.tm.touch === 'struck' ? 0.15 + 0.6 * nv : 0.0;
+    n.ioiPrev = ioiPrev; n.vHand = 0; n.att = null;
+    let nextOn = null; for (let j = i + 1; j < hs.length; j++) if (hs[j].t_on > n.t_on + 0.03) { nextOn = hs[j]; break; }
+    const legatoNext = nextOn && n.t_off >= nextOn.t_on - 0.04;
+    n.liftOff = legatoNext ? 0.004 : (nextOn && nextOn.t_on - n.t_off < 0.25 ? 0.008 : 0.012);
+  }
+  const groups = []; for (const n of hs) { const g = groups[groups.length - 1]; if (g && n.t_on - g[0].t_on <= 0.03) g.push(n); else groups.push([n]); }
+  let prevT = -1e9;
+  for (const g of groups) {
+    const tT = Math.min(...g.map(touchT)); const st = g.filter((n) => n.tm.touch === 'struck' && n.P0);
+    if (st.length) {
+      const v = Math.max(...st.map((n) => n.vfk)), ioi = g[0].ioiPrev;
+      const held = notes.some((m) => !g.includes(m) && m.P0 && touchT(m) < tT - 0.04 && upT(m) > tT);
+      let vh = held ? 0 : Math.min(v, V_HAND_MAX) * smoothstep(0.12, 0.30, ioi);
+      const Ld = clamp(0.4 * ioi, 0.04, 0.09), t0 = tT - Ld, tR = Math.max(prevT + 0.06, t0 - 0.2);
+      if (t0 - tR < 0.03) vh = 0;
+      if (vh > 0.01) { const att = { tT, Ld, h: vh * Ld / 2, v: vh, tR }; for (const n of g) { n.vHand = vh; n.att = att; } }
+    }
+    prevT = tT;
+  }
+}
+
 export class FingerAnimator {
   constructor(H, notes, keyAngleFn) {
     this.H = H; this.keyAngle = keyAngleFn;
     this.byF = {}; for (let f = 1; f <= 5; f++) this.byF[f] = notes.filter((n) => n.f === f && n.P0).sort((a, b) => a.tm.tFk - b.tm.tFk);
     this.all = notes;
-    // per note articulation parameters
-    const hs = notes.slice().sort((a, b) => a.t_on - b.t_on);
-    for (let i = 0; i < hs.length; i++) {
-      const n = hs[i]; const nv = clamp((n.vel - 20) / 100, 0, 1);
-      let prevOn = null; for (let j = i - 1; j >= 0; j--) if (hs[j].t_on < n.t_on - 0.03) { prevOn = hs[j]; break; }
-      const ioiPrev = prevOn ? n.t_on - prevOn.t_on : 1.0;
-      n.apex = n.tm.touch === 'struck' ? 0.008 + 0.027 * nv : 0.002 + 0.006 * nv + (ioiPrev > 0.4 ? 0.004 : 0);
-      n.apexLead = clamp(0.4 * ioiPrev, 0.05, 0.15);
-      n.vfk = n.tm.touch === 'struck' ? 0.15 + 0.6 * nv : 0.0;
-      let nextOn = null; for (let j = i + 1; j < hs.length; j++) if (hs[j].t_on > n.t_on + 0.03) { nextOn = hs[j]; break; }
-      const legatoNext = nextOn && n.t_off >= nextOn.t_on - 0.04;
-      n.liftOff = legatoNext ? 0.004 : (nextOn && nextOn.t_on - n.t_off < 0.25 ? 0.008 : 0.012);
-    }
   }
   /** cycle 2: smooth weight (0..1) that this hand has a finger on a key at t (merged contact intervals, 0.12 s ramps) */
   onKeysW(t) {
@@ -146,7 +172,10 @@ export class FingerAnimator {
     // <= 4 mm): when the palm was still travelling, the full world-space offset dragged the finger back toward the key's
     // world position (curl in), then let go of it as the palm caught up (fling). The landing itself is exact without it:
     // at u1 the palm is at palmAt(u1), where La maps back onto the key.
-    let landOff = next ? scale(sub(this.contactTarget(next, u1), toW(palm, La)), smoothstep(u1 - 0.06, u1 - 0.004, t)) : [0, 0, 0];
+    // (the hand's drop onto the keys carries the finger down, not a landing error: it is not steered away; its sink after
+    // an earlier touch of the group is, so a later finger still lands on its key)
+    const attY = env.attAt ? Math.max(0, env.attAt(t)) : 0;
+    let landOff = next ? scale(add(sub(this.contactTarget(next, u1), toW(palm, La)), [0, attY, 0]), smoothstep(u1 - 0.06, u1 - 0.004, t)) : [0, 0, 0];
     { const h = Math.hypot(landOff[0], landOff[2]); if (h > 0.004) landOff = [landOff[0] * 0.004 / h, landOff[1], landOff[2] * 0.004 / h]; }
     let p;
     if (prev && next && gap < 0.45) {
@@ -165,9 +194,12 @@ export class FingerAnimator {
       apex += this.crosses(prev, next, env.contactsNow) ? (f === 1 ? 0 : 0.016) : 0;
       if (f === 1) apex = Math.min(apex, 0.008);
       const tA = u1 - Math.min(next.apexLead, gap * 0.6);
+      // struck: the finger falls onto the key adding the speed the hand does not bring, with uniform acceleration when its
+      // apex (which also clears the keys it passes over) is no higher than that drop needs
+      const vF = next.tm.touch === 'struck' ? Math.max(0, next.vfk - next.vHand) : 0;
       let y;
       if (t < tA) { const u = (t - u0) / Math.max(1e-3, tA - u0); y = herm(0, 0, apex, 0, clamp(u, 0, 1)); }
-      else { const u = (t - tA) / Math.max(1e-3, u1 - tA); const dur = u1 - tA; y = herm(apex, 0, 0, -next.vfk * dur, clamp(u, 0, 1)); }
+      else { const u = clamp((t - tA) / Math.max(1e-3, u1 - tA), 0, 1); const dur = u1 - tA; y = vF > 0 && apex <= vF * dur / 2 ? apex * (1 - u * u) : herm(apex, 0, 0, -vF * dur, u); }
       p = add([base[0], base[1] + y, base[2]], landOff);
     } else {
       // lift off the previous key into the hover, hover, then approach the next key from above
@@ -188,11 +220,14 @@ export class FingerAnimator {
         if (t > u1 - tApp) {
           const u = (t - (u1 - tApp)) / tApp;
           const hEnd = 0.82; const s = minjerk(u / hEnd);
-          const above = add(Pn, [0, Math.max(next.apex * (f === 5 ? 0.6 : f === 4 ? 0.8 : 1), 0.004), 0]);   // fix round 2: shorter lift for 4 / 5
+          const vF = next.tm.touch === 'struck' ? Math.max(0, next.vfk - next.vHand) : 0;
+          let lift = Math.max(next.apex * (f === 5 ? 0.6 : f === 4 ? 0.8 : 1), 0.004);   // fix round 2: shorter lift for 4 / 5
+          if (vF > 0) lift = Math.min(lift, Math.max(0.004, vF * tApp * (1 - hEnd) / 2));
+          const above = add(Pn, [0, lift, 0]);
           const xz = lerp3(base, above, s);
           let y;
           if (u < hEnd) y = xz[1];
-          else { const v = (u - hEnd) / (1 - hEnd); y = herm(above[1], 0, Pn[1], -next.vfk * tApp * (1 - hEnd), v); }
+          else { const v = (u - hEnd) / (1 - hEnd); y = vF > 0 ? Pn[1] + lift * (1 - v * v) : herm(above[1], 0, Pn[1], -vF * tApp * (1 - hEnd), v); }
           p = add([xz[0], y, xz[2]], landOff);
         } else p = base;
       } else p = base;
