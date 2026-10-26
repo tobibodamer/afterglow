@@ -199,9 +199,10 @@ export class FingerAnimator {
     }
     // never sink into the key bed while free (except the last part of the approach onto its own key); the margin
     // ramps in after a release and out before a landing so the clamp never jumps
-    // (the thumb's pad is a point at its lowest corner: it is checked as a 6 mm sphere sitting on that point)
+    // (the thumb's pad is a point at its lowest corner: it is checked as a 9 mm sphere sitting on that point, wide enough
+    // for the flesh beside its tip, which otherwise grazes the neighbouring key while the hand is still settling)
     const clr = 0.006 * Math.min(prev ? smoothstep(u0, u0 + 0.06, t) : 1, next ? smoothstep(u1, u1 - 0.05, t) : 1) - 0.0012;
-    const rc = Math.max(r, 0.006), up = rc - r;
+    const rc = Math.max(r, f === 1 ? 0.009 : 0.006), up = rc - r;
     const sY = sphereClearY(p[0], p[2], rc * 0.92);
     const need = sY + rc * 0.08 + clr - up;
     if (p[1] < need) {

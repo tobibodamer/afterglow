@@ -427,7 +427,7 @@ export async function solve(opts) {
         // free fingers resting in the hover keep their abduction within +-12 deg (no sideways splay); in transfers and within
         // 0.1 s of a key they may use the full range (a cap there would make them miss their path and jump)
         const abdCap = tg.mode === 'free' && !(tg.dbg && tg.dbg.transfer) && Math.min(t - (tg.prev ? upT(tg.prev) : -1e9), (tg.next ? touchT(tg.next) : 1e9) - t) > 0.1 ? 12 * DEG : null;
-        const solveF = (p, a0) => (f === 1 ? H.solveThumb(palm, p, a0, tpref) : H.solveFinger(f, palm, p, a0, tg.dipRatio, null, pipB, abdCap));
+        const solveF = (p, a0) => (f === 1 ? H.solveThumb(palm, p, a0, tpref, tg.mode === 'free') : H.solveFinger(f, palm, p, a0, tg.dipRatio, null, pipB, abdCap));
         r = solveF(tg.p, warm[s][f]);
         // cycle 2 (critic S14: a free finger hinged at the knuckle with the PIP open, 'pointing'; range r7a: the 22 mm drape
         // of a rolled LH made L4/L5 MCP 60 / PIP at its 18 deg floor): where the free target can only be reached hinged

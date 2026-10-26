@@ -250,7 +250,7 @@ export class HandModel {
    * Thumb IK: pad centre at target; 4 unknowns (cmc, cmcAbd, mcp, ip) with soft priors toward a relaxed thumb and a DP
    * pitch preference (side of the tip on the key, distal phalanx 15-35 deg below horizontal).
    */
-  solveThumb(palm, target, a0, pref = null) {
+  solveThumb(palm, target, a0, pref = null, free = false) {
     const B = this.bindAngles[1];
     void B;
     const P = pref || THUMB_PREF;
@@ -288,7 +288,11 @@ export class HandModel {
         const lam = 1e-7;
         const AtA = [0, 1, 2, 3].map((i) => [0, 1, 2, 3].map((j) => J[i].reduce((s, v, m) => s + v * J[j][m], 0) + (i === j ? lam : 0)));
         const Atr = [0, 1, 2, 3].map((i) => J[i].reduce((s, v, m) => s + v * r[m], 0));
-        const dx = solveLin(AtA, Atr); if (!dx) break;
+        let dx = solveLin(AtA, Atr); if (!dx) break;
+        // free thumb: a joint held at its limit by the clamp is frozen and the step re-solved for the others (the clipped
+        // step otherwise stalls the whole chain: pinned at its MCP limit 15-33 mm short of its hover while the hand moved)
+        if (free) { const xc = clampX(x.map((v, k) => v - dx[k])); const fr = [0, 1, 2, 3].filter((k) => Math.abs(xc[k] - x[k]) < 1e-9 && Math.abs(dx[k]) > 1e-9);
+          if (fr.length && fr.length < 4) { for (const k of fr) { for (let j = 0; j < 4; j++) { AtA[k][j] = 0; AtA[j][k] = 0; } AtA[k][k] = 1; Atr[k] = 0; } const d2 = solveLin(AtA, Atr); if (d2) dx = d2; } }
         let step = 1, xn, rn, cn;
         for (let ls = 0; ls < 8; ls++) { xn = clampX(x.map((v, k) => v - step * dx[k])); rn = res(xn); cn = rn.reduce((s, v) => s + v * v, 0); if (cn < cost) break; step *= 0.5; }
         if (cn >= cost - 1e-16) break;
@@ -303,8 +307,9 @@ export class HandModel {
     if (pref && a0) {
       const e1 = len(sub(this.padCenter(1, fk(best.x)), target));
       // hysteresis (fix round 1): the restart only wins when it is clearly better, so consecutive samples do not
-      // flip-flop between two basins of the redundant chain (a 40-55 deg thumb pop)
-      if (e1 > 0.0003) { const b2 = lm(clampX([P.cmc, P.cmcAbd, P.mcp, P.ip])); if (b2.cost < 0.6 * best.cost) best = b2; }
+      // flip-flop between two basins of the redundant chain (a 40-55 deg thumb pop); a free thumb stalled more than 5 mm
+      // short takes any better restart
+      if (e1 > 0.0003) { const b2 = lm(clampX([P.cmc, P.cmcAbd, P.mcp, P.ip])); if (b2.cost < (free && e1 > 0.005 ? 1 : 0.6) * best.cost) best = b2; }
     }
     return this.polishThumb(palm, target, best.x, 10);
   }
