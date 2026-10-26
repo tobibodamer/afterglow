@@ -3,7 +3,8 @@
 //   node perf/qc/motion_stats.mjs <perfDir> [m0,m1] [--json out.json]
 // Per hand: wrist speed / acceleration / jerk percentiles, the share of playing time the hand is moving, and every
 // transfer (wrist faster than 5 cm/s) with its duration, peak speed and peak-to-mean speed ratio (1.875 for a
-// minimum-jerk reach, higher for a dash that starts late and brakes hard).
+// minimum-jerk reach, higher for a dash that starts late and brakes hard). Strike: per velocity band, the downward speed
+// of the playing finger's distal joint at the touch and its peak over the 100 ms before, and the wrist's at the touch.
 import fs from 'node:fs';
 import path from 'node:path';
 import { Rig } from '../lib/rig.js';
@@ -23,6 +24,8 @@ const boneIdx = meta.bones.map((b) => rig.idx(b)); const rootC = chan.get('root.
 const [m0, m1] = rangeArg || (meta.command?.match(/--range ([\d.]+),([\d.]+)/)?.slice(1).map(Number) ?? [meta.t0, meta.t0 + meta.duration]);
 const i0 = Math.max(0, Math.ceil((m0 - meta.t0) * rate)), i1 = Math.min(meta.frames - 1, Math.floor((m1 - meta.t0) * rate));
 const notes = meta.notes || [];
+// runs written before notes[].vel existed: velocities from the score
+if (notes.length && notes[0].vel === undefined && meta.inputs?.score && fs.existsSync(meta.inputs.score)) { const V = new Map(JSON.parse(fs.readFileSync(meta.inputs.score, 'utf8')).notes.map((n) => [n.id, n.vel])); for (const n of notes) n.vel = V.get(n.id); }
 
 const track = { R: { p: [], q: [] }, L: { p: [], q: [] } };
 const wristI = { R: rig.idx('wrist_R'), L: rig.idx('wrist_L') };
@@ -71,7 +74,29 @@ for (const s of ['R', 'L']) {
     tr_list: trs,
   };
 }
+const BANDS = [[0, 45], [45, 60], [60, 75], [75, 95], [95, 128]];
+const fkCache = new Map();
+const fkAt = (i) => { if (fkCache.has(i)) return fkCache.get(i); const o = i * S;
+  meta.bones.forEach((b, k) => { const c = chan.get(b); local[boneIdx[k]] = [F[o + c.offset], F[o + c.offset + 1], F[o + c.offset + 2], F[o + c.offset + 3]]; });
+  const r = rig.fk(local, [F[o + rootC.offset], F[o + rootC.offset + 1], F[o + rootC.offset + 2]]).p; fkCache.set(i, r); return r; };
+const down = (i, j) => -(fkAt(i + 1)[j][1] - fkAt(i - 1)[j][1]) * rate / 2;
+if (notes.length && notes[0].vel !== undefined) {
+  const med = (a) => +pct(a, 0.5).toFixed(3);
+  out.strike = BANDS.map(([a, b]) => {
+    const ns = notes.filter((n) => n.vel >= a && n.vel < b && n.tFk >= m0 && n.tFk <= m1);
+    const tip = [], peak = [], wr = [];
+    for (const n of ns) {
+      const ji = rig.idx(`finger${n.finger}-3_${n.hand}`), wi = rig.idx(`wrist_${n.hand}`); const iF = Math.round((n.tFk - meta.t0) * rate);
+      if (iF < 1 + Math.round(0.1 * rate) || iF >= meta.frames - 2) continue;
+      let pk = 0; for (let i = iF - Math.round(0.1 * rate); i <= iF; i++) pk = Math.max(pk, down(i, ji));
+      tip.push(down(iF, ji)); peak.push(pk); wr.push(down(iF, wi));
+    }
+    return { vel: `${a}-${b}`, n: tip.length, struck: ns.filter((n) => n.touch === 'struck').length, tip_at_touch: med(tip), tip_peak_100ms: med(peak), wrist_at_touch: med(wr) };
+  });
+}
 const row = (k) => `${k.padEnd(14)} ${String(out.R[k]).padStart(9)} ${String(out.L[k]).padStart(9)}`;
 console.log(`${dir}  m ${m0}..${m1}\n${''.padEnd(14)} ${'R'.padStart(9)} ${'L'.padStart(9)}`);
 for (const k of Object.keys(out.R)) if (k !== 'tr_list') console.log(row(k));
+if (out.strike) { console.log('strike (m/s down, medians)  vel     n  struck  tip@touch  tip peak  wrist@touch');
+  for (const r of out.strike) console.log(`${''.padEnd(28)} ${r.vel.padEnd(7)} ${String(r.n).padStart(4)} ${String(r.struck).padStart(6)} ${String(r.tip_at_touch).padStart(9)} ${String(r.tip_peak_100ms).padStart(9)} ${String(r.wrist_at_touch).padStart(11)}`); }
 if (jsonOut) fs.writeFileSync(jsonOut, JSON.stringify(out, null, 1));
