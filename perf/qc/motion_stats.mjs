@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Hand-motion quality metrics measured on the WRITTEN tracks (rig FK of perf.bin), so any two runs compare directly.
 //   node perf/qc/motion_stats.mjs <perfDir> [m0,m1] [--json out.json]
-// Per hand: wrist speed / acceleration / jerk percentiles, the share of playing time the hand is moving, and every
+// Per hand: wrist speed / acceleration / jerk percentiles, the share of playing time the hand is still, creeping or moving, and every
 // transfer (wrist faster than 5 cm/s) with its duration, peak speed and peak-to-mean speed ratio (1.875 for a
 // minimum-jerk reach, higher for a dash that starts late and brakes hard). Strike: per velocity band, the downward speed
 // of the playing finger's distal joint at the touch and its peak over the 100 ms before, and the wrist's at the touch.
@@ -66,6 +66,7 @@ for (const s of ['R', 'L']) {
     speed_p50: +pct(play, 0.5).toFixed(4), speed_p95: +pct(play, 0.95).toFixed(3), speed_max: +Math.max(...sp).toFixed(3),
     moving_share: +(play.filter((v) => v > 0.02).length / Math.max(1, play.length)).toFixed(3),
     still_share: +(play.filter((v) => v < 0.005).length / Math.max(1, play.length)).toFixed(3),
+    slow_share: +(play.filter((v) => v >= 0.005 && v < 0.03).length / Math.max(1, play.length)).toFixed(3),   // creeping (5-30 mm/s)
     acc_p95: +pct(acc, 0.95).toFixed(2), acc_max: +Math.max(...acc).toFixed(2),
     jerk_p95: +pct(jerk, 0.95).toFixed(1), jerk_p99: +pct(jerk, 0.99).toFixed(1), jerk_rms: +Math.sqrt(jerk.reduce((x, y) => x + y * y, 0) / jerk.length).toFixed(1),
     ang_p95: +pct(ang, 0.95).toFixed(1), ang_max: +Math.max(...ang).toFixed(1),

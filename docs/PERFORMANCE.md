@@ -71,7 +71,7 @@ marked `fix round 1` in the code. Section 9 lists them with before/after numbers
 1. **Timing** (`timing.js`): HV = 2^((v-52)/25) m/s; key travel tt = 89.16 HV^-0.570 ms before note-on (struck
    touch 35 ms less, >= 20 ms); key bottom kb = 12.106 HV^-0.702 - 7.444 ms after note-on; pressed profile tau^2,
    struck 1-(1-tau)^1.6; release starts 25 ms before t_off, critically damped (half travel at t_off). Struck touch
-   for v > 95 and detached loud chords, and for LEAP LANDINGS: an onset group the hand must leap to (lateral travel
+   (`solver.js`) for v > 95, detached loud chords, v >= 58 more than 60 ms after the hand's last release, and for LEAP LANDINGS: an onset group the hand must leap to (lateral travel
    d beyond a hand width) with less than 0.06 s + 0.45 s/m x d between the previous group's key bottom and a pressed
    contact is played from the air (struck). Re-strikes start from the partly raised key (double escapement); the key
    rises ~60 % first (the stroke starts >= 30 ms after the previous release began, as long as it still takes >= 15 ms).
@@ -106,19 +106,23 @@ marked `fix round 1` in the code. Section 9 lists them with before/after numbers
    8-28 mm (thumb 1.5-20 mm) behind the black front. A strained keyframe (wrist, roll or yaw out of band, a contact out
    of reach) lets a held key go when the pedal covers it and is re-solved.
 5. **Palm trajectory** (`trajectory.js`, outside the keyframe cache hash): hold at each keyframe, then a min-jerk
-   transfer of an unhurried length that grows with the distance (`transferTime`: 0.3 s + 1.6 s/m, at most 0.9 s),
+   transfer at a nearly constant hand speed (`transferTime`: 1.875 d / (0.25 + 1.5 d), 0.10 s up to 1.3 cm, 0.28 s at
+   5 cm, 0.47 s at 10 cm, at most 0.6 s: short moves are quick, not a slow glide),
    ending with the hand set over the next keys up to 100 ms before the first of them is touched. In a longer gap the
    hand waits at its old position and leaves just in time (it never crawls across the whole gap); when the music
    leaves less time the transfer starts as soon as the fingers that do not carry over are off their keys - never
    earlier: with no time left the hand arrives late and the landing is struck. Leap arcs (apex 15 mm + 0.12 d), leap
    pivots. `smoothPalmPath` then makes the whole path minimum-jerk (banded least squares, per channel: stiffness 1
-   where a finger is on a key, 0.003 between contacts, jerk weight (50 ms / dt)^6), re-solved with the held samples
+   where a finger is on a key, 0.003 between contacts, jerk weight (35 ms / dt)^6, cutoff ~4.5 Hz), re-solved with the held samples
    stiffened until the path stays within what the fingers absorb (6 mm of fingertip motion, 1.5 mm from touch to key
    bottom): dense passages glide through their positions, every transfer has a bell-shaped speed profile, and a leap
    away from a held finger still waits for it. That slack is one-sided along the reference's motion (0.35 s back and
    ahead): the hand may trail its last move or lead into its next, but a swing against the coming move or past an
-   arrival gets 1.5 mm, so there is no wind-up before a leap and no overshoot after it. On top: rest lifts and phrase-end lift-offs, arm-weight settling after
-   loud attacks, a slow settle and drift on every hold longer than 0.6 s (1.5 mm sink, < 1 mm noise), 12 ms zero-phase
+   arrival gets 1.5 mm, so there is no wind-up before a leap and no overshoot after it. On top: the hand's attack on struck groups (`fingers.js articulate`, rendered in `verticalOffsets`): the palm
+   rises h (min-jerk), falls with uniform acceleration (no braking) and meets
+   the keys at vHand = min(vfk, 0.35 m/s) x smoothstep(0.12, 0.30 s of IOI), then sinks with them (-v s e^(-s/20 ms));
+   none while another finger of the hand holds a key. Rest lifts and phrase-end lift-offs, arm-weight settling after
+   loud attacks the hand does not carry, a slow settle and drift on every hold longer than 0.6 s (1.5 mm sink, < 1 mm noise), 12 ms zero-phase
    smoothing. `contactPreservingPalm`
    nudges the palm (<= 12 mm / 6 deg, Gauss-Newton, smoothed 10 ms) wherever a finger on its key could not reach it OR
    its flesh cuts into a neighbouring key. While another finger is still in its stroke, a finger riding its released key
@@ -133,7 +137,9 @@ marked `fix round 1` in the code. Section 9 lists them with before/after numbers
    a restart only wins when clearly better (no basin flip-flop); its pad point is the tip's SUPPORT POINT toward the
    keys. Every contact is measured on the skinned mesh and the target corrected along the key normal (continuous, no
    gates). A note's contact starts at `touchT`: pressed notes sit on the resting key one film frame (17 ms) before it
-   moves, struck notes land as it starts. A finger re-striking its key rides it up, lifts 2-4 mm when there is time and
+   moves, struck notes land as it starts, at the pad speed vfk = 0.15 + 0.6 nv: the finger adds what the hand's
+   attack does not bring (vfk - vHand) with a uniform-acceleration drop from its apex (or a Hermite when its apex must
+   stay higher to clear the keys it passes over). A finger re-striking its key rides it up, lifts 2-4 mm when there is time and
    slides its contact point continuously to the next note's. Free fingers: relaxed cascade (MCP 17-29 deg index to
    little, PIP 36-44) with a slow drift, carried by the hand + <= 4 mm lag, >= 5 mm above the keys (no upper clamp:
    a lifted hand keeps its curl); the free thumb rests >= 8 mm behind the key front; departure/arrival paths in the
@@ -800,7 +806,32 @@ Whole piece vs a fresh run of the previous code (the stored run above came from 
 Left by the score: R m 64.9 thumb deep on A#4 until 26 ms before R4 lands on the front of G5 (60 mm of depth in 40 ms);
 the keyframe planner (finger reach) has to choose compatible contact depths there.
 
+### Strike and glide round (same day)
+
+Critique: the keys went down slower than they sound (the approach eased out onto the key), and small moves glided
+slowly while big ones were fast (distance set the speed). Changes: struck touch for v >= 58 when the hand has been off
+the keys for 60 ms; the hand's attack and the finger's accent (sections 3.5 and 3.6); a nearly constant transfer speed
+and a 35 ms smoother (section 3.5). Whole piece, `--qc-rate 15`:
+
+| measure | before | strike | strike + glide |
+|---|---|---|---|
+| tip speed at the touch p50, v 60-75 / 75-95 / 95+ (m/s) | 0.013 / 0.075 / 0.39 | 0.18 / 0.29 / 0.29 | 0.17 / 0.29 / 0.31 |
+| wrist speed at the touch p50, v 60-75 / 75-95 / 95+ (m/s) | 0.006 / 0.005 / 0.003 | 0.10 / 0.07 / 0.10 | 0.09 / 0.06 / 0.10 |
+| hand still / slow (5-30 mm/s) share (R / L) | 0.27 / 0.19; 0.31 / 0.33 | 0.28 / 0.19; 0.29 / 0.30 | 0.33 / 0.24; 0.25 / 0.26 |
+| transfer duration p50 (R / L, s) | 0.200 / 0.279 | 0.192 / 0.296 | 0.183 / 0.296 |
+| QC contact p99 / max (mm); hold max; notes off key | 0.40 / 0.82; 0.84; 1 | 0.35 / 0.81; 1.71; 0 | 0.36 / 0.63; 1.76; 0 |
+| QC own-key / free / neighbour flesh > 1 mm | 601 / 2714 / 28324 | 999 / 3628 / 28075 | 990 / 3645 / 25978 |
+
+The hand's attack is designed for up to 0.35 m/s at the touch, but only ~0.1 m/s reaches the wrist: the stages after
+`verticalOffsets` (palm smoothing, contact nudge) absorb most of it. Pressed notes (v < 58, legato) still land at rest.
+
 ### Open items (next rounds)
+- (after the strike round) Fingertip speed at the touch should scale with the velocity for every note (pressed notes
+  land at rest; v 95+ reaches ~0.3 of its 0.66 m/s, less than before the round); free fingers should glide toward their
+  next key as soon as they are released instead of hovering and moving in the last 0.15-0.35 s; the hand's attack is
+  absorbed downstream (above); the hand pose is keyframed per onset group, so fingers snap between predefined poses
+  instead of the hand adapting continuously to the fingers that need it (needs a continuous palm-pose optimisation
+  with finger stretch).
 - (after cycle 2 fix round 2) Bar 22 id322 (above); octave passages keep the thumb ~50-60 mm out (the span allowance:
   natural for octaves, still counted by the critic's pointer census, S22/S21/S20c); starfish spread and ring-little
   scissor (free 4 should follow a deeply flexed contact 5: MCP coupling, not only abduction); release ride (pad on the

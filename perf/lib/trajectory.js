@@ -2,7 +2,7 @@
 // from plan.js so motion changes do not invalidate the keyframe cache.
 //
 // Timing follows how a prepared pianist moves (research/performance.md 4.6): a transfer takes an unhurried time that
-// grows with the distance (transferTime, capped) and ends with the hand set over the next keys shortly before they are
+// is set by a nearly constant hand speed (transferTime) and ends with the hand set over the next keys shortly before they are
 // played. In a longer gap the hand waits at its old position (it does not crawl across the whole gap) and leaves just in
 // time; only when the music leaves less time than transferTime does the transfer start as soon as the fingers that do
 // not carry over are off their keys, and get faster. smoothPalmPath then turns the held-pose/transfer reference into one minimum-jerk path (Flash & Hogan 1985):
@@ -11,9 +11,10 @@
 import { qMul, qRot, qSlerp, qConj, qLog, qExp, qAxisAngle, qAngle, add, sub, len, DEG, clamp, minjerk, lerp3, smoothstep } from './math.js';
 import { touchT, upT } from './fingers.js';
 
-/** unhurried transfer time for a palm path of d metres (wrist travel + 95 mm per radian of turn): 0.3 s for a small
- * shift, ~0.8 s for a two-octave leap; peak speed of the min-jerk reach 1.875 d / T (0.1 m/s at 2 cm, 0.7 m/s at 30 cm) */
-export const transferTime = (d) => clamp(0.30 + 1.6 * d, 0.30, 0.90);
+/** unhurried transfer time for a palm path of d metres (wrist travel + 95 mm per radian of turn): the hand moves at a
+ * nearly constant speed that grows a little with the distance (min-jerk peak 0.25 m/s + 1.5 d), so a small shift is
+ * quick instead of a slow glide: 0.10 s up to 1.3 cm, 0.28 s at 5 cm, 0.47 s at 10 cm, at most 0.6 s */
+export const transferTime = (d) => clamp(1.875 * d / (0.25 + 1.5 * d), 0.10, 0.60);
 
 /** arrival and departure times of every keyframe (P.kf[k].A / .D), then the leap pivots */
 export function buildTrajectory(P, { tStart, tEnd, phrases }) {
@@ -158,7 +159,7 @@ export function palmBase(P, t) {
 }
 
 // smoothPalmPath: stiffness while a finger is on a key and for the free hand; how far the path may leave the reference
-export const PATH_TAU = 0.05;        // s: smoothing time constant where the stiffness is 1 (cutoff ~3 Hz)
+export const PATH_TAU = 0.035;       // s: smoothing time constant where the stiffness is 1 (cutoff ~4.5 Hz)
 const W_CONTACT = 1, W_FREE = 0.003;
 const TOL_HOLD = 0.006, TOL_LAND = 0.0015;   // m of fingertip motion the fingers absorb (wrist shift + 95 mm lever x turn)
 const TOL_SWING = 0.0015, SWING_LOOK = 0.35;   // m of wind-up against the coming move / overshoot past the arrival; s looked ahead and back
