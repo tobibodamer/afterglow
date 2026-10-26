@@ -248,7 +248,7 @@ samples were there get their render in the background. Solved songs are kept in 
 While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges; a paused frame is rendered again in full
 (N 4 in preview, the shot's own N with **Final quality**, which also switches to the film's full-size bakes and reloads
 the page at the same moment). The render size is the screen's, at most 1920 x 1080 (`?w=&h=` sets it). Space plays and
-pauses, the arrow keys skip 5 s, F is fullscreen.
+pauses, the arrow keys skip 5 s, F or a double-click is fullscreen.
 
 The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
 piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives their

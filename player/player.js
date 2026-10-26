@@ -5,7 +5,7 @@
 //             camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
 // One AG session per page (AG.init runs once), so changing song or quality reloads the page (at ?t=, paused).
 //   ?w=&h= render size (default: the screen's pixels, at most 1920x1080)   ?quality=preview|final   ?t=<film s>
-//   keys: space play/pause, arrows +-5 s, home, f fullscreen
+//   keys: space play/pause, arrows +-5 s, home, f / double-click fullscreen
 import { createFilm } from '/scene/src/main.js';
 import { PianoSynth, ScorePlayer } from './synth.js';
 
@@ -175,13 +175,16 @@ async function playback(id) {
     p.set('t', now().toFixed(2));
     location.search = p;
   };
+  const fullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
+  $('fs').onclick = fullscreen;
+  $('stage').ondblclick = fullscreen;
   seek.onclick = (e) => { const r = seek.getBoundingClientRect(); seekTo(((e.clientX - r.left) / r.width) * END); };
   addEventListener('keydown', (e) => {
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     else if (e.code === 'ArrowRight') seekTo(now() + 5);
     else if (e.code === 'ArrowLeft') seekTo(now() - 5);
     else if (e.code === 'Home') seekTo(0);
-    else if (e.code === 'KeyF') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
+    else if (e.code === 'KeyF') fullscreen();
   });
   let idle = 0;
   addEventListener('mousemove', () => { $('bar').classList.remove('idle'); clearTimeout(idle); idle = setTimeout(() => { if (playing) $('bar').classList.add('idle'); }, 2500); });
