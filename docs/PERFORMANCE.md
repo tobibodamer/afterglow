@@ -105,11 +105,19 @@ marked `fix round 1` in the code. Section 9 lists them with before/after numbers
    keys 2-6 mm RADIAL of the key centre (its ulnar flesh stays over its own key while the key is down), black keys
    8-28 mm (thumb 1.5-20 mm) behind the black front. A strained keyframe (wrist, roll or yaw out of band, a contact out
    of reach) lets a held key go when the pedal covers it and is re-solved.
-5. **Palm trajectory**: hold at each keyframe, min-jerk transfers that start only when the fingers that do not carry
-   over have left their keys - never earlier: with no time left the hand arrives late and the landing is struck
-   (anticipation: arrival 35 ms before the first finger-key contact, up to 0.5 s travel), leap arcs (apex 15 mm +
-   0.12 d), rest lifts and phrase-end lift-offs, arm-weight settling after loud attacks, a slow settle and drift on
-   every hold longer than 0.6 s (1.5 mm sink, < 1 mm noise), 30 ms zero-phase smoothing. `contactPreservingPalm`
+5. **Palm trajectory** (`trajectory.js`, outside the keyframe cache hash): hold at each keyframe, then a min-jerk
+   transfer of an unhurried length that grows with the distance (`transferTime`: 0.3 s + 1.6 s/m, at most 0.9 s),
+   ending with the hand set over the next keys up to 100 ms before the first of them is touched. In a longer gap the
+   hand waits at its old position and leaves just in time (it never crawls across the whole gap); when the music
+   leaves less time the transfer starts as soon as the fingers that do not carry over are off their keys - never
+   earlier: with no time left the hand arrives late and the landing is struck. Leap arcs (apex 15 mm + 0.12 d), leap
+   pivots. `smoothPalmPath` then makes the whole path minimum-jerk (banded least squares, per channel: stiffness 1
+   where a finger is on a key, 0.003 between contacts, jerk weight (50 ms / dt)^6), re-solved with the held samples
+   stiffened until the path stays within what the fingers absorb (6 mm of fingertip motion, 1.5 mm from touch to key
+   bottom): dense passages glide through their positions, every transfer has a bell-shaped speed profile, and a leap
+   away from a held finger still waits for it. On top: rest lifts and phrase-end lift-offs, arm-weight settling after
+   loud attacks, a slow settle and drift on every hold longer than 0.6 s (1.5 mm sink, < 1 mm noise), 12 ms zero-phase
+   smoothing. `contactPreservingPalm`
    nudges the palm (<= 12 mm / 6 deg, Gauss-Newton, smoothed 10 ms) wherever a finger on its key could not reach it OR
    its flesh cuts into a neighbouring key. `separateHands` keeps a hand that has no finger on a key >= 10 mm (capsules)
    from the other hand. After the final release each hand lifts ~2 cm and is lowered onto the thigh in ~1.5 s.
@@ -183,6 +191,10 @@ vertex), at the film rate (60 Hz), with the command line recorded in both files:
 See section 8 (filled in from the last full run's `build/anim/qc.json`).
 
 ## 6. Tools and diagnostics
+
+`perf/qc/motion_stats.mjs <perfDir> [m0,m1] [--json f]` (in the repository): hand-motion quality on the written tracks
+(rig FK of the wrist): speed / acceleration / jerk percentiles, the share of playing time the hand is still or moving,
+and every transfer (wrist > 5 cm/s) with duration, peak speed and peak-to-mean ratio (1.875 = a min-jerk reach).
 
 `sandbox/perf/`: `qcsum.mjs <dir>` (QC summary), `kf_stats.mjs [cache]` (keyframe posture percentiles and the strained
 keyframes), `kf_pen.mjs` (keyframe penetration), `kf_probe.mjs R 21.81` (named objective residuals of one keyframe),

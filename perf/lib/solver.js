@@ -9,6 +9,7 @@ import { ArmModel } from './arm.js';
 import { handFeatures, wristAngles, elbowPos, bestSwivel } from './palm.js';
 import { HandPlanner, resolveFingerTiming, releaseForReach, releaseForTravel, planRestrikes, T_UP_AFTER_REL0, rel0Of, UNCOVERED_EARLY } from './plan.js';
 import { spanLimits } from './fingering.js';
+import { smoothPalmPath } from './trajectory.js';
 import { FingerAnimator, touchT, upT } from './fingers.js';
 import { KeyTracks } from './keys.js';
 import { BodyMotion, bodyLocals, springFilter } from './body.js';
@@ -288,8 +289,11 @@ export async function solve(opts) {
   for (const s of ['R', 'L']) {
     const P = planners[s]; const ps = new Array(N), qs = new Array(N);
     const off = verticalOffsets(P, planNotes[s], t0, dt, N);
-    for (let i = 0; i < N; i++) { const t = t0 + i * dt; const b = P.palmBase(t); ps[i] = add(b.p, [off.x[i], off.y[i], off.z[i]]); qs[i] = b.q; }
-    // light smoothing of the palm path where keyframes are dense (removes stop-and-go), zero-phase
+    // minimum-jerk path through the keyframe holds and transfers (trajectory.js), then the musical offsets on top
+    const base = smoothPalmPath(P, planNotes[s], t0, dt, N);
+    log(`[solve] ${s}: minimum-jerk palm path in ${base.iters} solves (${base.over} held samples still beyond the fingers' slack)`);
+    for (let i = 0; i < N; i++) { ps[i] = add(base.p[i], [off.x[i], off.y[i], off.z[i]]); qs[i] = base.q[i]; }
+    // light zero-phase smoothing of the offsets' onsets (the arm-weight dip starts with a corner)
     const sm = smoothPalm(ps, qs, P, t0, dt);
     // critic round 2: hand world-orientation rate cap (zero-phase, before the contact-preserving nudge)
     if (!opts.noOriCap) { const st = capPalmTurnRate(sm, range); log(`[solve] ${s}: palm turn-rate cap (${ORI_CAP_DEG} deg per 240 Hz sample): ${st.events} events, worst step ${st.worstBefore.toFixed(2)} -> ${st.worstAfter.toFixed(2)} deg`); }
