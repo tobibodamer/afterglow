@@ -246,9 +246,11 @@ Salamander samples and the Python packages of the Soundtrack step above (the pla
 `AG_PYTHON`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
 samples were there get their render in the background. Solved songs are kept in `build/player/` and start at once.
 While it plays, every frame is one sub-frame (N = 1) with SMAA on the edges; a paused frame is rendered again in full
-(N 4 in preview, the shot's own N with **Final quality**, which also switches to the film's full-size bakes and reloads
-the page at the same moment). The render size is the screen's, at most 1920 x 1080 (`?w=&h=` sets it). Space plays and
-pauses, the arrow keys skip 5 s, F or a double-click is fullscreen.
+(N 4 in preview, the shot's own N in final quality). The settings menu (kept per browser) switches the quality (final
+also uses the film's full-size bakes), the render size (the screen's by default, at most 1920 x 1080), the sub-frames
+while playing (1, 2 or 4), SMAA, the full paused frame and a stats overlay (frame rate, N, size, shot and bar); quality
+and size reload the page at the same moment. Space plays and pauses, the arrow keys skip 5 s, F or a double-click is
+fullscreen, S shows the stats.
 
 The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
 piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives their

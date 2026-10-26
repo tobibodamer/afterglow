@@ -1,11 +1,12 @@
 // The real-time player page (served by player/play.mjs). Two states:
 //   library   no ?song: open / drop a MIDI file (uploaded to the server, which converts and solves it) or pick one
-//   playback  ?song=<id>: the film's page core (scene/src/main.js), driven by the audio clock; N = 1 + SMAA while
+//   playback  ?song=<id>: the film's page core (scene/src/main.js), driven by the audio clock; N sub-frames + SMAA while
 //             playing, the full frame (preview N 4 / the shot's own N in final) once paused;
 //             camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
-// One AG session per page (AG.init runs once), so changing song or quality reloads the page (at ?t=, paused).
-//   ?w=&h= render size (default: the screen's pixels, at most 1920x1080)   ?quality=preview|final   ?t=<film s>
-//   keys: space play/pause, arrows +-5 s, home, f / double-click fullscreen
+// Settings (the menu, kept in localStorage): quality and resolution apply at AG.init, which runs once per page, so they
+// reload the page at the same moment (?t=, paused); the rest apply at once.
+//   URL overrides: ?w=&h= render size   ?quality=preview|final   ?t=<film s>
+//   keys: space play/pause, arrows +-5 s, home, f / double-click fullscreen, s stats, esc closes the menu
 import { createFilm } from '/scene/src/main.js';
 import { PianoSynth, ScorePlayer } from './synth.js';
 
@@ -14,6 +15,16 @@ const q = new URLSearchParams(location.search);
 const songId = q.get('song');
 const api = (p, o) => fetch(`/player/api/${p}`, o).then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; });
 const fmt = (s) => { s = Math.max(0, s); return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; };
+const PREFS_KEY = 'afterglow.player';
+const prefs = { quality: 'preview', size: 'screen', n: 1, smaa: true, refine: true, stats: false };
+try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch { /* defaults */ }
+const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* not kept */ } };
+const svg = (d) => `<svg viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+const ICON = {
+  play: svg('M8 5.5v13l10.5-6.5z'), pause: svg('M7 5h3.5v14H7zm6.5 0H17v14h-3.5z'),
+  fs: svg('M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z'),
+  fsExit: svg('M8 4h2v6H4V8h4zm6 0h2v4h4v2h-6zM4 14h6v6H8v-4H4zm10 0h6v2h-4v4h-2z'),
+};
 const STAGE = { queued: 'Waiting', solving: 'Solving the performance', camera: 'Tracking the hands', sound: 'Rendering the sound', ready: 'Ready', error: 'Failed' };
 
 /** the song's rendered WAV (music/render_audio.py, sample 0 = music time 0) with ScorePlayer's start / tick / stop */
@@ -91,8 +102,8 @@ async function playback(id) {
 
   const AG = createFilm();
   window.AG = AG;
-  const quality = q.get('quality') === 'final' ? 'final' : 'preview';
-  const px = Math.min(1920, screen.width * devicePixelRatio, (screen.height * devicePixelRatio * 16) / 9);
+  const quality = (q.get('quality') || prefs.quality) === 'final' ? 'final' : 'preview';
+  const px = prefs.size === 'screen' ? Math.min(1920, screen.width * devicePixelRatio, (screen.height * devicePixelRatio * 16) / 9) : (+prefs.size * 16) / 9;
   const W = +(q.get('w') || 2 * Math.round(px / 2)), H = +(q.get('h') || 2 * Math.round((W * 9) / 32));
   await AG.init({
     width: W, height: H, quality, motionBoost: false, warmup: false,
@@ -130,11 +141,11 @@ async function playback(id) {
     base = audio.currentTime + 0.05 - pos;
     sched.start(audio.currentTime + 0.05, pos - OFFSET);
     timer = setInterval(() => sched.tick(), 50);
-    playing = true; $('play').textContent = 'Pause';
+    playing = true; $('play').innerHTML = ICON.pause; $('play').ariaLabel = 'Pause';
   }
   function stop() {
     if (!playing) return;
-    pos = now(); playing = false; clearInterval(timer); sched.stop(); $('play').textContent = 'Play';
+    pos = now(); playing = false; clearInterval(timer); sched.stop(); $('play').innerHTML = ICON.play; $('play').ariaLabel = 'Play';
   }
   const toggle = () => (playing ? stop() : start());
   const seekTo = (t) => { const was = playing; stop(); pos = Math.min(END, Math.max(0, t)); dirty = true; if (was) start(); };
@@ -142,40 +153,93 @@ async function playback(id) {
   // render loop: the newest frame of the clock, never queued (a slow frame drops the ones it overran); a frame that
   // stays still for a moment is rendered again in full
   let rendering = false, lastFrame = -1, dirty = true, full = false, stillSince = 0;
+  const presented = [];   // presentation times of the last second while playing
+  let last = { shot: '', bar: null, N: 0, ms: 0 };
   async function frameLoop() {
     requestAnimationFrame(frameLoop);
     let t = now();
     if (playing && t >= END) { stop(); pos = END; }
     t = Math.min(t, END - 1 / 60);
     // paused at the very start: show the vista, not the black of the fade-in
-    const shown = !playing && t < 2.5 ? 2.5 : t;
-    const f = Math.floor(shown * 60);
+    const f = Math.floor((!playing && t < 2.5 ? 2.5 : t) * 60);
     $('seek').querySelector('.fill').style.width = `${(100 * t) / END}%`;
     $('time').textContent = `${fmt(t)} / ${fmt(END)}`;
+    if (prefs.stats) showStats();
     if (rendering) return;
     if (f !== lastFrame || dirty) { full = false; stillSince = performance.now(); }
-    else if (playing || full || performance.now() - stillSince < 250) return;
+    else if (playing || full || !prefs.refine || performance.now() - stillSince < 250) return;
     else full = true;
     rendering = true; dirty = false; lastFrame = f;
     try {
-      const r = await AG.renderFrame(f, { N: full ? undefined : 1, transfer: 'none', sync: false });
-      AG.present({ smaa: true });
-      const d = window.__AG_CAMERA?.diag?.last;
-      $('shot').textContent = d ? `${r.shot} · bar ${d.bar}` : r.shot;
+      const t0 = performance.now();
+      // the full frame waits for the GPU, so its time is the real one; playing frames stay pipelined
+      const r = await AG.renderFrame(f, { N: full ? undefined : prefs.n, transfer: 'none', sync: full });
+      AG.present({ smaa: prefs.smaa });
+      const t1 = performance.now();
+      if (playing) { presented.push(t1); while (presented[0] < t1 - 1000) presented.shift(); } else presented.length = 0;
+      last = { shot: r.shot, bar: window.__AG_CAMERA?.diag?.last?.bar, N: r.N, ms: full ? t1 - t0 : 0 };
     } catch (e) { console.error(e); } finally { rendering = false; }
   }
+  function showStats() {
+    const head = playing ? `${presented.length} fps` : last.ms ? `paused · ${Math.round(last.ms)} ms` : 'paused';
+    $('stats').textContent = `${head}\nN ${last.N} · ${W}x${H} · ${quality}\n${last.shot}${last.bar != null ? ` · bar ${last.bar}` : ''}`;
+  }
+
+  // settings menu
+  const reload = () => {
+    const p = new URLSearchParams(location.search);
+    for (const k of ['quality', 'w', 'h']) p.delete(k);
+    p.set('t', now().toFixed(2));
+    location.search = p;
+  };
+  const SETTINGS = [
+    { key: 'quality', label: 'Quality', opts: [['preview', 'Preview'], ['final', 'Final']], reload: true, value: () => quality },
+    { key: 'size', label: 'Resolution', opts: [['screen', 'Screen'], ['1440', '1440p'], ['1080', '1080p'], ['720', '720p']], reload: true },
+    { key: 'n', label: 'Samples playing', opts: [[1, '1'], [2, '2'], [4, '4']] },
+    { key: 'smaa', label: 'SMAA', opts: [[true, 'On'], [false, 'Off']] },
+    { key: 'refine', label: 'Full frame paused', opts: [[true, 'On'], [false, 'Off']] },
+    { key: 'stats', label: 'Stats', opts: [[true, 'On'], [false, 'Off']] },
+  ];
+  function buildMenu() {
+    const menu = $('menu');
+    menu.innerHTML = '';
+    for (const s of SETTINGS) {
+      const row = document.createElement('div'); row.className = 'row';
+      const label = document.createElement('span'); label.textContent = s.label;
+      const seg = document.createElement('div'); seg.className = 'seg';
+      const cur = String(s.value ? s.value() : prefs[s.key]);
+      for (const [v, text] of s.opts) {
+        const b = document.createElement('button'); b.textContent = text;
+        b.classList.toggle('on', String(v) === cur);
+        b.onclick = () => {
+          if (String(v) === cur) return;
+          prefs[s.key] = v; savePrefs();
+          if (s.reload) return reload();
+          dirty = true; $('stats').classList.toggle('hidden', !prefs.stats); buildMenu();
+        };
+        seg.appendChild(b);
+      }
+      row.append(label, seg); menu.appendChild(row);
+    }
+  }
+  const toggleMenu = (open = $('menu').classList.contains('hidden')) => {
+    if (open) buildMenu();
+    $('menu').classList.toggle('hidden', !open); $('set').classList.toggle('on', open);
+  };
+  const toggleStats = () => { prefs.stats = !prefs.stats; savePrefs(); $('stats').classList.toggle('hidden', !prefs.stats); if (!$('menu').classList.contains('hidden')) buildMenu(); };
 
   $('busy').classList.add('hidden');
   $('bar').classList.remove('hidden');
   $('play').onclick = toggle;
-  $('final').classList.toggle('on', quality === 'final');
-  $('final').onclick = () => {
-    const p = new URLSearchParams(location.search);
-    if (quality === 'final') p.delete('quality'); else p.set('quality', 'final');
-    p.set('t', now().toFixed(2));
-    location.search = p;
-  };
+  $('stats').classList.toggle('hidden', !prefs.stats);
+  $('set').onclick = (e) => { e.stopPropagation(); toggleMenu(); };
+  $('menu').onclick = (e) => e.stopPropagation();
+  addEventListener('click', () => toggleMenu(false));
   const fullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
+  addEventListener('fullscreenchange', () => {
+    const on = !!document.fullscreenElement;
+    $('fs').innerHTML = on ? ICON.fsExit : ICON.fs; $('fs').ariaLabel = on ? 'Exit fullscreen' : 'Fullscreen';
+  });
   $('fs').onclick = fullscreen;
   $('stage').ondblclick = fullscreen;
   seek.onclick = (e) => { const r = seek.getBoundingClientRect(); seekTo(((e.clientX - r.left) / r.width) * END); };
@@ -185,9 +249,14 @@ async function playback(id) {
     else if (e.code === 'ArrowLeft') seekTo(now() - 5);
     else if (e.code === 'Home') seekTo(0);
     else if (e.code === 'KeyF') fullscreen();
+    else if (e.code === 'KeyS') toggleStats();
+    else if (e.code === 'Escape') toggleMenu(false);
   });
   let idle = 0;
-  addEventListener('mousemove', () => { $('bar').classList.remove('idle'); clearTimeout(idle); idle = setTimeout(() => { if (playing) $('bar').classList.add('idle'); }, 2500); });
+  addEventListener('mousemove', () => {
+    $('bar').classList.remove('idle'); clearTimeout(idle);
+    idle = setTimeout(() => { if (playing && $('menu').classList.contains('hidden')) $('bar').classList.add('idle'); }, 2500);
+  });
   requestAnimationFrame(frameLoop);
 }
 
