@@ -12,7 +12,21 @@ const q = new URLSearchParams(location.search);
 const songId = q.get('song');
 const api = (p, o) => fetch(`/player/api/${p}`, o).then(async (r) => { const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; });
 const fmt = (s) => { s = Math.max(0, s); return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; };
-const STAGE = { queued: 'Waiting', solving: 'Solving the performance', camera: 'Tracking the hands', ready: 'Ready', error: 'Failed' };
+const STAGE = { queued: 'Waiting', solving: 'Solving the performance', camera: 'Tracking the hands', sound: 'Rendering the sound', ready: 'Ready', error: 'Failed' };
+
+/** the song's rendered WAV (music/render_audio.py, sample 0 = music time 0) with ScorePlayer's start / tick / stop */
+class WavPlayer {
+  constructor(ctx, buffer) { this.ctx = ctx; this.buffer = buffer; this.src = null; }
+  start(ctxTime, m) {
+    this.stop();
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.buffer; src.connect(this.ctx.destination);
+    if (m >= 0) src.start(ctxTime, m); else src.start(ctxTime - m, 0);
+    this.src = src;
+  }
+  tick() {}
+  stop() { if (this.src) { try { this.src.stop(); } catch { /* never started */ } this.src.disconnect(); this.src = null; } }
+}
 
 // ------------------------------------------------------------------------------------------------ library
 async function library() {
@@ -24,7 +38,7 @@ async function library() {
     const li = document.createElement('li');
     li.innerHTML = `<span class="t"></span><span class="s"></span>`;
     li.querySelector('.t').textContent = s.title;
-    li.querySelector('.s').textContent = s.stage === 'ready' ? fmt(s.duration) : s.stage === 'solving' ? `${Math.round(s.progress * 100)} %` : STAGE[s.stage] || s.stage;
+    li.querySelector('.s').textContent = s.stage === 'ready' ? fmt(s.duration) : s.stage === 'solving' || s.stage === 'sound' ? `${Math.round(s.progress * 100)} %` : STAGE[s.stage] || s.stage;
     li.onclick = () => (s.stage === 'ready' ? go(s.id) : follow(s.id));
     ul.appendChild(li);
   }
@@ -85,6 +99,13 @@ async function playback(id) {
   const cam = await import(camUrl);
   const score = AG.ctx.data.score;
   const END = cam.FILM_END, OFFSET = AG.MUSIC_OFFSET;
+  // sound: the rendered WAV when the song has one (decoded now; the context starts on the first Play), else the synth
+  const audio = new AudioContext({ latencyHint: 'interactive' });
+  let wav = null;
+  if (st.audio === 'ready') {
+    $('busyLine').textContent = 'Loading the sound';
+    wav = await fetch(`${dir}/audio.wav`).then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio.decodeAudioData(b)).catch((e) => { console.warn('[player] audio.wav not used:', e); return null; });
+  }
 
   // seek bar: section starts
   const seek = $('seek');
@@ -92,17 +113,17 @@ async function playback(id) {
   $('title').textContent = st.title;
 
   // clock: film time from the audio clock while playing (minus the output latency, so picture meets sound)
-  let audio = null, synth = null, sched = null, base = 0, playing = false, pos = 0, timer = 0;
+  const synth = wav ? null : new PianoSynth(audio);
+  const sched = wav ? new WavPlayer(audio, wav) : new ScorePlayer(synth, score);
+  let base = 0, playing = false, pos = 0, timer = 0;
   const now = () => (playing ? audio.currentTime - (audio.outputLatency || audio.baseLatency || 0) - base : pos);
+  window.__AG_PLAYER = { audio, synth, sched, now, source: wav ? 'wav' : 'synth' };   // debugging only
   function start() {
-    if (!audio) {
-      audio = new AudioContext({ latencyHint: 'interactive' }); synth = new PianoSynth(audio); sched = new ScorePlayer(synth, score);
-      window.__AG_PLAYER = { audio, synth, sched, now };   // debugging only
-    }
     audio.resume();
     if (pos >= END - 0.05) pos = 0;
-    const lat = audio.outputLatency || audio.baseLatency || 0;
-    base = audio.currentTime + 0.05 - lat - pos;          // 50 ms to schedule the first notes
+    // film time pos is scheduled at context time base + pos (50 ms ahead for the first notes); now() takes the output
+    // latency off, so the picture shows pos when pos is heard
+    base = audio.currentTime + 0.05 - pos;
     sched.start(audio.currentTime + 0.05, pos - OFFSET);
     timer = setInterval(() => sched.tick(), 50);
     playing = true; $('play').textContent = 'Pause';
