@@ -511,8 +511,8 @@ export function createFilm() {
       return res;
     },
 
-    /** draw the last output frame to the page canvas (interactive preview) */
-    present() { S.final.present(); },
+    /** draw the last output frame to the page canvas (interactive preview); opts: { smaa } */
+    present(opts) { S.final.present(opts); },
     setCamera(override) { S.director.setOverride(override || null); },
     /** session LUT: null | 'identity' = none; 'film' = the film LUT; a URL (.cube or raw Float32); .cube text; or a Float32Array S^3*3|4 table */
     async setLUT(src) {

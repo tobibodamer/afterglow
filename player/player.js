@@ -1,7 +1,7 @@
 // The real-time player page (served by player/play.mjs). Two states:
 //   library   no ?song: open / drop a MIDI file (uploaded to the server, which converts and solves it) or pick one
-//   playback  ?song=<id>: the film's page core (scene/src/main.js) at N = 1, preview bakes, driven by the audio clock;
-//             camera = the auto edit for this score (scene/src/camera/auto.js), sound = player/synth.js
+//   playback  ?song=<id>: the film's page core (scene/src/main.js) at N = 1 + SMAA, preview bakes, driven by the audio
+//             clock; camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
 // One AG session per page (AG.init runs once), so changing song reloads the page.
 //   ?w=1280&h=720 render size   ?quality=preview|final   keys: space play/pause, arrows +-5 s, home, f fullscreen
 import { createFilm } from '/scene/src/main.js';
@@ -151,7 +151,7 @@ async function playback(id) {
     rendering = true; dirty = false; lastFrame = f;
     try {
       const r = await AG.renderFrame(f, { N: 1, transfer: 'none', sync: false });
-      AG.present();
+      AG.present({ smaa: true });
       const d = window.__AG_CAMERA?.diag?.last;
       $('shot').textContent = d ? `${r.shot} · bar ${d.bar}` : r.shot;
     } catch (e) { console.error(e); } finally { rendering = false; }
