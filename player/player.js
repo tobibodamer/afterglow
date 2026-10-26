@@ -3,7 +3,8 @@
 //   playback  ?song=<id>: the film's page core (scene/src/main.js) at N = 1 + SMAA, preview bakes, driven by the audio
 //             clock; camera = the auto edit for this score (scene/src/camera/auto.js), sound = the rendered WAV or player/synth.js
 // One AG session per page (AG.init runs once), so changing song reloads the page.
-//   ?w=1280&h=720 render size   ?quality=preview|final   keys: space play/pause, arrows +-5 s, home, f fullscreen
+//   ?w=&h= render size (default: the screen's pixels, at most 1920x1080)   ?quality=preview|final
+//   keys: space play/pause, arrows +-5 s, home, f fullscreen
 import { createFilm } from '/scene/src/main.js';
 import { PianoSynth, ScorePlayer } from './synth.js';
 
@@ -89,7 +90,8 @@ async function playback(id) {
 
   const AG = createFilm();
   window.AG = AG;
-  const W = +(q.get('w') || 1280), H = +(q.get('h') || 720);
+  const px = Math.min(1920, screen.width * devicePixelRatio, (screen.height * devicePixelRatio * 16) / 9);
+  const W = +(q.get('w') || 2 * Math.round(px / 2)), H = +(q.get('h') || 2 * Math.round((W * 9) / 32));
   await AG.init({
     width: W, height: H, quality: q.get('quality') || 'preview', N: 1, motionBoost: false, warmup: false,
     cameraModule: camUrl, modules: { camera: camUrl },

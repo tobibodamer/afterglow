@@ -245,7 +245,8 @@ automatic edit cut on the bars (`scene/src/camera/auto.js`, built from the film'
 Salamander samples and the Python packages of the Soundtrack step above (the player uses `.venv` when there is one, or
 `AG_PYTHON`); without them the page plays a synthesised Web Audio piano (`player/synth.js`). Songs solved before the
 samples were there get their render in the background. Solved songs are kept in `build/player/` and start at once.
-Space plays and pauses, the arrow keys skip 5 s, F is fullscreen; `?w=1920&h=1080` sets the render size.
+The render size is the screen's, at most 1920 x 1080 (`?w=&h=` sets it). Space plays and pauses, the arrow keys
+skip 5 s, F is fullscreen.
 
 The hand split puts 98-99.5 % of the notes in the composer's hand on the four scores in `music/` and 89.5 % on
 piano-midi.de's performance of Clair de lune, whose left-hand arpeggios climb past the right hand (the split gives their
